@@ -25,6 +25,8 @@ import AutoCompleteInput from "../../components/AutoCompleteInput";
 import { useFetchCollection } from "../../hook/useFetchCollection";
 import ContextData from "./components/ContextData";
 
+import ViewStory from "../../layout/ViewStory";
+
 const Chat: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
   const [userStory, setUserStory] = React.useState<string | null>(null);
@@ -377,108 +379,130 @@ const Chat: React.FC = () => {
               )}
             </div>
           )}
-          <WelcomeChatComp />
-          {contextDataForStory && <ContextData data={contextDataForStory} />}
+
           <div className="chat-msg">
-            {userStory && (
-              <CreateUserStory
-                userStory={userStory}
-                setUserStory={setUserStory}
-                testCase={testCase}
-                generateTestCases={generateTestCases}
-              />
-            )}
-            {testCase && (
-              <CreateTestCases
-                testCase={testCase}
-                setTestCase={setTestCase}
-                generateTestCases={generateTestCases}
-                generateTestData={generateTestData}
-              />
-            )}
-            {testData && (
-              <>
-                <CreateTestData
-                  testData={testData}
-                  setTestData={setTestData}
-                  generateTestData={generateTestData}
-                />
-
-                <FormControl fullWidth>
-                  <div style={{ display: "flex" }}>
-                    <div style={{ marginRight: 10 }}>
-                      <InputLabel id="demo-simple-select-label">
-                        Select language
-                      </InputLabel>
-                      <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={codeLang}
-                        label="Age"
-                        onChange={handleChange}
-                        size="small"
-                        style={{ width: "200px" }}
-                      >
-                        <MenuItem value={"React JS"}>React JS</MenuItem>
-                        <MenuItem value={"Python"}>Python</MenuItem>
-                        <MenuItem value={"HTML"}>HTML</MenuItem>
-                        <MenuItem value={"Kotlin"}>Kotlin</MenuItem>
-                        <MenuItem value={"Apex"}>Apex (Salesforce)</MenuItem>
-                      </Select>
-                    </div>
-                    <button
-                      className="newConversationButton"
-                      style={{ width: "130px", height: 30 }}
-                      onClick={() => generateCode()}
-                    >
-                      Generate code
-                      <img
-                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
-                        alt="Clear Chat"
-                      />
-                    </button>
-                  </div>
-                </FormControl>
-              </>
-            )}
-            {code && !loading && (
-              <>
-                <h2>Generated Code</h2>
-
-                <AceEditor
-                  mode="javascript"
-                  theme="monokai"
-                  value={code}
-                  onChange={(newValue) => {
-                    setCode(newValue);
-                    localStorage.setItem("code", newValue);
-                  }}
-                  setOptions={{
-                    useWorker: false,
-                  }}
-                  editorProps={{ $blockScrolling: true }}
-                  //   height="400px"
-                  width="100%"
-                  style={{ padding: 10, borderRadius: 15 }}
-                />
-
-                <br />
-
-                <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <button
-                    className="newConversationButton"
-                    style={{ width: "130px" }}
-                    onClick={() => saveDataToLocalStorage()}
-                  >
-                    {taskId ? "Update" : "Save"}
-                    <img
-                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
-                      alt="Clear Chat"
+            <ViewStory
+              taskId={taskId}
+              welcomeCompontent={() => userStory && <WelcomeChatComp />}
+              userStory={() =>
+                userStory && (
+                  <CreateUserStory
+                    userStory={userStory}
+                    setUserStory={setUserStory}
+                    testCase={testCase}
+                    generateTestCases={generateTestCases}
+                  />
+                )
+              }
+              testCase={() =>
+                testCase && (
+                  <CreateTestCases
+                    testCase={testCase}
+                    setTestCase={setTestCase}
+                    generateTestCases={generateTestCases}
+                    generateTestData={generateTestData}
+                  />
+                )
+              }
+              testData={() =>
+                testData && (
+                  <>
+                    <CreateTestData
+                      testData={testData}
+                      setTestData={setTestData}
+                      generateTestData={generateTestData}
                     />
-                  </button>
-                </div>
-              </>
-            )}
+
+                    <FormControl fullWidth>
+                      <div style={{ display: "flex" }}>
+                        <div style={{ marginRight: 10 }}>
+                          <InputLabel id="demo-simple-select-label">
+                            Select language
+                          </InputLabel>
+                          <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={codeLang}
+                            label="Age"
+                            onChange={handleChange}
+                            size="small"
+                            style={{ width: "200px" }}
+                          >
+                            <MenuItem value={"React JS"}>React JS</MenuItem>
+                            <MenuItem value={"Python"}>Python</MenuItem>
+                            <MenuItem value={"HTML"}>HTML</MenuItem>
+                            <MenuItem value={"Kotlin"}>Kotlin</MenuItem>
+                            <MenuItem value={"Apex"}>
+                              Apex (Salesforce)
+                            </MenuItem>
+                          </Select>
+                        </div>
+                        <button
+                          className="newConversationButton"
+                          style={{ width: "130px", height: 30 }}
+                          onClick={() => generateCode()}
+                        >
+                          Generate code
+                          <img
+                            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
+                            alt="Clear Chat"
+                          />
+                        </button>
+                      </div>
+                    </FormControl>
+                  </>
+                )
+              }
+              codeData={() =>
+                code &&
+                !loading && (
+                  <>
+                    <h2>Generated Code</h2>
+
+                    <AceEditor
+                      mode="javascript"
+                      theme="monokai"
+                      value={code}
+                      onChange={(newValue) => {
+                        setCode(newValue);
+                        localStorage.setItem("code", newValue);
+                      }}
+                      setOptions={{
+                        useWorker: false,
+                      }}
+                      editorProps={{ $blockScrolling: true }}
+                      //   height="400px"
+                      width="100%"
+                      style={{ padding: 10, borderRadius: 15 }}
+                    />
+
+                    <br />
+
+                    <div
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                      <button
+                        className="newConversationButton"
+                        style={{ width: "130px" }}
+                        onClick={() => saveDataToLocalStorage()}
+                      >
+                        {taskId ? "Update" : "Save"}
+                        <img
+                          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
+                          alt="Clear Chat"
+                        />
+                      </button>
+                    </div>
+                  </>
+                )
+              }
+              referance={() =>
+                contextDataForStory && (
+                  <ContextData data={contextDataForStory} />
+                )
+              }
+            />
+
             {loading && <Loader />}
           </div>
         </div>
