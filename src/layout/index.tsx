@@ -8,11 +8,12 @@ import HomeIcon from "@mui/icons-material/Home";
 import SaveAsIcon from "@mui/icons-material/SaveAs";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
+import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 
 const iconStyle = {
   //  color: "#d04a02",
   color: "black",
-  fontSize: 30,
+  fontSize: 25,
   marginRight: 5,
 };
 const routes = [
@@ -27,10 +28,16 @@ const routes = [
     icon: () => <SaveAsIcon style={iconStyle} />,
   },
   {
+    path: "/user-story",
+    name: "Create New Story",
+    icon: () => <LibraryAddIcon style={iconStyle} />,
+  },
+  {
     path: "/backlog",
     name: "Story Backlog",
     icon: () => <DashboardIcon style={iconStyle} />,
   },
+
   {
     path: "/upload",
     name: "Upload Document",
@@ -89,7 +96,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 >
                   <button className="sidenav-button">
                     {route.icon()}
-                    {route.name}
+                    <span style={{ fontSize: 14 }}>{route.name}</span>
                   </button>
                 </a>
               );

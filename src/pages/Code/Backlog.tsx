@@ -60,7 +60,13 @@ const Backlog: React.FC = () => {
           + Add User Story
         </Button>
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", margin: "1rem" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          margin: "1rem",
+        }}
+      >
         {backlogItems.map((item) => (
           <div className="card-container">
             <div

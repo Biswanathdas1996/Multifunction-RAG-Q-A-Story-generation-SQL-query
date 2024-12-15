@@ -105,11 +105,12 @@ const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
       renderInput={(params) => (
         <TextField
           {...params}
+          size="small"
           label="Select or add a collection"
           style={{
-            height: 30,
             width: 190,
-            padding: 3,
+            padding: 0,
+            float: "right",
           }}
         />
       )}
