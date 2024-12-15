@@ -3,8 +3,49 @@ import React, { ReactNode } from "react";
 interface LayoutProps {
   children: ReactNode;
 }
+import SettingsIcon from "@mui/icons-material/Settings";
+import HomeIcon from "@mui/icons-material/Home";
+import SaveAsIcon from "@mui/icons-material/SaveAs";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import UploadFileIcon from "@mui/icons-material/UploadFile";
+
+const iconStyle = {
+  //  color: "#d04a02",
+  color: "black",
+  fontSize: 30,
+  marginRight: 5,
+};
+const routes = [
+  {
+    path: "/home",
+    name: "Home",
+    icon: () => <HomeIcon style={iconStyle} />,
+  },
+  {
+    path: "/query",
+    name: "Saved Query",
+    icon: () => <SaveAsIcon style={iconStyle} />,
+  },
+  {
+    path: "/backlog",
+    name: "Story Backlog",
+    icon: () => <DashboardIcon style={iconStyle} />,
+  },
+  {
+    path: "/upload",
+    name: "Upload Document",
+    icon: () => <UploadFileIcon style={iconStyle} />,
+  },
+  {
+    path: "/config",
+    name: "Config",
+    icon: () => <SettingsIcon style={iconStyle} />,
+  },
+];
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  console.log("window.location.pathname", window.location.href);
+
   return (
     <div>
       <div className="chatbot-page">
@@ -30,58 +71,29 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
         <div className="main-container">
           <div className="sidenav">
-            <a className="nav-link active-link" href="/">
-              <button className="sidenav-button">
-                <img
-                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAAAXNSR0IArs4c6QAABClJREFUaAXtmrtuE0EUhmfHeYCIJ0C8Qd7AaZB3HSQ39EmfIl1K8gIkbqnsgj6uoUgqKGcNEgIBcoiQgKDIkYKQIiEt+mdzNvZ69jI3e5FYaTze2bmcb86ZM5ddxhxfos3WRYe1Rcj24ogP4jAQcRhM4ogncwFpYXASh8Ex8qKMY1HcVSehQtaTAkfBdA4kD1Z6H0wlcIdtu5POoiaAjTvsSWwFldMsdUCq9YHosPsWIpoV9QpGgDMxOnFpoOIh63nR2AyQ0sTDYCJ8mq7UWsiOlI1XCefw+TjkR5DFzPYKSsE8pDd0KKhVR6XadDM2b+EW3fyqYV1AuoZ7+/hecj0+Sa5ejRL8t9IiOtgG0gfc789xQhf+rwwSg1i5+jA0S4AQ3J9f0wQBl0NIoeV4xg69ZR7uw+5GguAaEt61wEfOJ2OusR4bt5pWwVHdPiAxR8/T5O5cjrsyOG+QcDplc2S6rixYG2qMvzpwviBFxA9yektvpfY0IEjAfKwDR2Udm+tUqUUR8iE1aBqbwFFbLiGVWrSdFmzgPEDOa9HWc7qAcw0551FFFIyoAd3YJRy17cRcw+AkczZxlxsdM/iAcwiZmikOe6hSndgnHMlhq0l5kCW6HKdfWiv7ZcCRTDaQIuR7THf8LRPOAeSApUd99TWIvRwuLJbRuySEjxidSfXOavL6zWmWTs8LYsFExM8KHioruRj1F+De7TxIvhzuKPPr1J3P++35QXL+dDurF5A3P86Sn6N+lpYvk7ufsFxC3YJZPsChUQhjW1e+POrENQuZz1N1bw14+XIohfAJePliYNx5/wGrTKBMg+93N+QhEw6aqoLKYZGJWmlQ18nkgcsAP+5vSvOt8/Npf3PBDB0AwskEIi+0zn0dQEwp54c7ykBnMz4ARdQ6Zbb7wDqAN98nC9qhToQHxuUFsBOMmMlSjYRD3GhAuVQzXGwTZKMBt9baTPTYuul2qeEanN7tB/GuXHNHQfmbqkGB8UeXeNTqkcC6cWMBo9bde34bM20o4ISUl8U4atPVHvITIGJM7LPh67M9OQXUmSaQd7Ys/md1669FBxkY/THVIq02ylYrdQDLyl8c194eyfkWh9jENRebaBGbUvQ0JuyiULZBxbOicki/eq33slR56EuUplo0MW1PZfAlhlp7GSS+WDKcMlZdTsx6TgJSxSLi/VULq9u+CHlfxaJMk6ZqucvQFdAyf/l7QRXl7eu05n0+sjh8qsedChBp/wCkORxBNxjSHq7BkKJyOiDh68ZwPE3wrvCWylfUdUGq8mGuiSO+fOfT5VMRtso/E6kSvu5zmIfJss5oKgBYxA+8aq0IXIKmHy+41+gqwVTAMF0RtUY2xx8oi6M+mOJKNKYCU6WJrbU2TusALAVWvMHCgbPo8lh0W0OZF2XKvlJSNVQj7S9Jw4CsiA5XgQAAAABJRU5ErkJggg=="
-                  alt="Home"
-                  className="nav-icon"
-                />
-                Home
-              </button>
-            </a>
-            <a className="nav-link" href="/#/query">
-              <button className="sidenav-button">
-                <img
-                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAAAXNSR0IArs4c6QAABClJREFUaAXtmrtuE0EUhmfHeYCIJ0C8Qd7AaZB3HSQ39EmfIl1K8gIkbqnsgj6uoUgqKGcNEgIBcoiQgKDIkYKQIiEt+mdzNvZ69jI3e5FYaTze2bmcb86ZM5ddxhxfos3WRYe1Rcj24ogP4jAQcRhM4ogncwFpYXASh8Ex8qKMY1HcVSehQtaTAkfBdA4kD1Z6H0wlcIdtu5POoiaAjTvsSWwFldMsdUCq9YHosPsWIpoV9QpGgDMxOnFpoOIh63nR2AyQ0sTDYCJ8mq7UWsiOlI1XCefw+TjkR5DFzPYKSsE8pDd0KKhVR6XadDM2b+EW3fyqYV1AuoZ7+/hecj0+Sa5ejRL8t9IiOtgG0gfc789xQhf+rwwSg1i5+jA0S4AQ3J9f0wQBl0NIoeV4xg69ZR7uw+5GguAaEt61wEfOJ2OusR4bt5pWwVHdPiAxR8/T5O5cjrsyOG+QcDplc2S6rixYG2qMvzpwviBFxA9yektvpfY0IEjAfKwDR2Udm+tUqUUR8iE1aBqbwFFbLiGVWrSdFmzgPEDOa9HWc7qAcw0551FFFIyoAd3YJRy17cRcw+AkczZxlxsdM/iAcwiZmikOe6hSndgnHMlhq0l5kCW6HKdfWiv7ZcCRTDaQIuR7THf8LRPOAeSApUd99TWIvRwuLJbRuySEjxidSfXOavL6zWmWTs8LYsFExM8KHioruRj1F+De7TxIvhzuKPPr1J3P++35QXL+dDurF5A3P86Sn6N+lpYvk7ufsFxC3YJZPsChUQhjW1e+POrENQuZz1N1bw14+XIohfAJePliYNx5/wGrTKBMg+93N+QhEw6aqoLKYZGJWmlQ18nkgcsAP+5vSvOt8/Npf3PBDB0AwskEIi+0zn0dQEwp54c7ykBnMz4ARdQ6Zbb7wDqAN98nC9qhToQHxuUFsBOMmMlSjYRD3GhAuVQzXGwTZKMBt9baTPTYuul2qeEanN7tB/GuXHNHQfmbqkGB8UeXeNTqkcC6cWMBo9bde34bM20o4ISUl8U4atPVHvITIGJM7LPh67M9OQXUmSaQd7Ys/md1669FBxkY/THVIq02ylYrdQDLyl8c194eyfkWh9jENRebaBGbUvQ0JuyiULZBxbOicki/eq33slR56EuUplo0MW1PZfAlhlp7GSS+WDKcMlZdTsx6TgJSxSLi/VULq9u+CHlfxaJMk6ZqucvQFdAyf/l7QRXl7eu05n0+sjh8qsedChBp/wCkORxBNxjSHq7BkKJyOiDh68ZwPE3wrvCWylfUdUGq8mGuiSO+fOfT5VMRtso/E6kSvu5zmIfJss5oKgBYxA+8aq0IXIKmHy+41+gqwVTAMF0RtUY2xx8oi6M+mOJKNKYCU6WJrbU2TusALAVWvMHCgbPo8lh0W0OZF2XKvlJSNVQj7S9Jw4CsiA5XgQAAAABJRU5ErkJggg=="
-                  alt="History"
-                  className="nav-icon"
-                />
-                Saved Queries
-                <div className="button-decoration"></div>
-              </button>
-            </a>
-            <a className="nav-link" href="/#/upload">
-              <button className="sidenav-button">
-                <img
-                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAAAXNSR0IArs4c6QAABClJREFUaAXtmrtuE0EUhmfHeYCIJ0C8Qd7AaZB3HSQ39EmfIl1K8gIkbqnsgj6uoUgqKGcNEgIBcoiQgKDIkYKQIiEt+mdzNvZ69jI3e5FYaTze2bmcb86ZM5ddxhxfos3WRYe1Rcj24ogP4jAQcRhM4ogncwFpYXASh8Ex8qKMY1HcVSehQtaTAkfBdA4kD1Z6H0wlcIdtu5POoiaAjTvsSWwFldMsdUCq9YHosPsWIpoV9QpGgDMxOnFpoOIh63nR2AyQ0sTDYCJ8mq7UWsiOlI1XCefw+TjkR5DFzPYKSsE8pDd0KKhVR6XadDM2b+EW3fyqYV1AuoZ7+/hecj0+Sa5ejRL8t9IiOtgG0gfc789xQhf+rwwSg1i5+jA0S4AQ3J9f0wQBl0NIoeV4xg69ZR7uw+5GguAaEt61wEfOJ2OusR4bt5pWwVHdPiAxR8/T5O5cjrsyOG+QcDplc2S6rixYG2qMvzpwviBFxA9yektvpfY0IEjAfKwDR2Udm+tUqUUR8iE1aBqbwFFbLiGVWrSdFmzgPEDOa9HWc7qAcw0551FFFIyoAd3YJRy17cRcw+AkczZxlxsdM/iAcwiZmikOe6hSndgnHMlhq0l5kCW6HKdfWiv7ZcCRTDaQIuR7THf8LRPOAeSApUd99TWIvRwuLJbRuySEjxidSfXOavL6zWmWTs8LYsFExM8KHioruRj1F+De7TxIvhzuKPPr1J3P++35QXL+dDurF5A3P86Sn6N+lpYvk7ufsFxC3YJZPsChUQhjW1e+POrENQuZz1N1bw14+XIohfAJePliYNx5/wGrTKBMg+93N+QhEw6aqoLKYZGJWmlQ18nkgcsAP+5vSvOt8/Npf3PBDB0AwskEIi+0zn0dQEwp54c7ykBnMz4ARdQ6Zbb7wDqAN98nC9qhToQHxuUFsBOMmMlSjYRD3GhAuVQzXGwTZKMBt9baTPTYuul2qeEanN7tB/GuXHNHQfmbqkGB8UeXeNTqkcC6cWMBo9bde34bM20o4ISUl8U4atPVHvITIGJM7LPh67M9OQXUmSaQd7Ys/md1669FBxkY/THVIq02ylYrdQDLyl8c194eyfkWh9jENRebaBGbUvQ0JuyiULZBxbOicki/eq33slR56EuUplo0MW1PZfAlhlp7GSS+WDKcMlZdTsx6TgJSxSLi/VULq9u+CHlfxaJMk6ZqucvQFdAyf/l7QRXl7eu05n0+sjh8qsedChBp/wCkORxBNxjSHq7BkKJyOiDh68ZwPE3wrvCWylfUdUGq8mGuiSO+fOfT5VMRtso/E6kSvu5zmIfJss5oKgBYxA+8aq0IXIKmHy+41+gqwVTAMF0RtUY2xx8oi6M+mOJKNKYCU6WJrbU2TusALAVWvMHCgbPo8lh0W0OZF2XKvlJSNVQj7S9Jw4CsiA5XgQAAAABJRU5ErkJggg=="
-                  alt="History"
-                  className="nav-icon"
-                />
-                Upload Doc.
-                <div className="button-decoration"></div>
-              </button>
-            </a>
-            <a aria-current="page" className="nav-link" href="/">
-              <button className="sidenav-button">
-                <img
-                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAAAXNSR0IArs4c6QAAA4VJREFUaAXtm42R4jAMhVMCJVACJaQESqAEOjg6WDqADo4OSAe5DnIdUMI7XtYihtjBseXgnTnNZJyYxNZnyfLfblUpC4AVgBrAHsAJQAugw1iYdwXw27xbK6uiV5yB2hqFb2OW4Bx+S+CdnnYJJRmwXwBSoHz0tDA9YJ2gYtynmcFcwGzEZUAB0BVzWMwFZufRovlc11jty67xQ/fUYRXne56v6B4mGn6IaVQtranjsgaOBZYm6ZDacLfbDXVdY7vdgvcKEg+ZA26z2aCqqv7i/ccgTUBRc0uCCNxqtQIvgipCcrYUHngAqEXLV7i2bcErA+SXJ0Y+Z3OsUegbfREuOCk7E+T2meblSbPfTcFlhGS38rvqvWJOiZIlBE4qyWDJw4vdvh+N9aTe6HQOnFSiDMnxZ2zFO+BZKoxNY+CkLmXIsRU9i1Kp/22aAieFK0I+WzE1cmrAZYAcIiqAi1QwN9WEk7qVLHl9BJvY9V0OOEXIbzc1G0RSbnCaE06UULBkXZkdLSkzKF0CThRJhNwTcFb/WxJOAfJEQO5NBgvXclwJcLLM1s0pbEwR25JcUwZKS8C/gS/3r+33+xFc13U4nbjDpyuHwwHn8zD/IOR6vQZ1CJSOgElCOFZKZbSFZdJbbMi5dSQD7na7XomcgKwjVv4Dvmu5KQuyzzAghFyugCUummrBWUHmFXgKsGma3n1lo2kqvV7HwVwBsA8ySbE+BJBDCqOs65K9mUyADfvgEIdfzRPwHALIKOsT/kbLZgK8EDB4UHEpWThgP1ULnhb8QMB+ss0j52FO5KKYyCvYgjd7PTgOYRNQ9k8FA15sQB5qRknBgMNhqTmLiHLTQgG7h/XkBkDUbFkAmXJgt6/j8dgPASHDBN+1v+W9XfZM9zoJ1yONtaLMNqZmKSGAU9/PWB5JO7hPf2OsyEUpW5oQvmtqgcrffN8xP+KwdLzpK2aMtaI0WwHp+xNf82ciBegapcIQOcVqrvRuyWNU8Z/96OhiceYZV01aZSzMOn0u6KLUPAzNDPu+37kAmfcDIOPhBLpgyHS4giEZH9yDuSg9NzWBp4ToSh3GR9RzgXzvm8NSusfSwsXAcKjpU1Aj3/TLqMl5RKsQjHXls5qvUQwoN61yWPRzYC5g47o8iotaVxrL8tvGTBeXt5gLzJVn/VsBgamwa3OZeX/uXkAP4M4eN7/Uof4B761s+UM7AxAAAAAASUVORK5CYII="
-                  alt="Logout"
-                  className="nav-icon"
-                />
-                Logout
-              </button>
-            </a>
-            <a aria-current="page" className="nav-link" href="#/backlog">
-              <button className="sidenav-button">
-                <img
-                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADgAAAA4CAYAAACohjseAAAAAXNSR0IArs4c6QAAA4VJREFUaAXtm42R4jAMhVMCJVACJaQESqAEOjg6WDqADo4OSAe5DnIdUMI7XtYihtjBseXgnTnNZJyYxNZnyfLfblUpC4AVgBrAHsAJQAugw1iYdwXw27xbK6uiV5yB2hqFb2OW4Bx+S+CdnnYJJRmwXwBSoHz0tDA9YJ2gYtynmcFcwGzEZUAB0BVzWMwFZufRovlc11jty67xQ/fUYRXne56v6B4mGn6IaVQtranjsgaOBZYm6ZDacLfbDXVdY7vdgvcKEg+ZA26z2aCqqv7i/ccgTUBRc0uCCNxqtQIvgipCcrYUHngAqEXLV7i2bcErA+SXJ0Y+Z3OsUegbfREuOCk7E+T2meblSbPfTcFlhGS38rvqvWJOiZIlBE4qyWDJw4vdvh+N9aTe6HQOnFSiDMnxZ2zFO+BZKoxNY+CkLmXIsRU9i1Kp/22aAieFK0I+WzE1cmrAZYAcIiqAi1QwN9WEk7qVLHl9BJvY9V0OOEXIbzc1G0RSbnCaE06UULBkXZkdLSkzKF0CThRJhNwTcFb/WxJOAfJEQO5NBgvXclwJcLLM1s0pbEwR25JcUwZKS8C/gS/3r+33+xFc13U4nbjDpyuHwwHn8zD/IOR6vQZ1CJSOgElCOFZKZbSFZdJbbMi5dSQD7na7XomcgKwjVv4Dvmu5KQuyzzAghFyugCUummrBWUHmFXgKsGma3n1lo2kqvV7HwVwBsA8ySbE+BJBDCqOs65K9mUyADfvgEIdfzRPwHALIKOsT/kbLZgK8EDB4UHEpWThgP1ULnhb8QMB+ss0j52FO5KKYyCvYgjd7PTgOYRNQ9k8FA15sQB5qRknBgMNhqTmLiHLTQgG7h/XkBkDUbFkAmXJgt6/j8dgPASHDBN+1v+W9XfZM9zoJ1yONtaLMNqZmKSGAU9/PWB5JO7hPf2OsyEUpW5oQvmtqgcrffN8xP+KwdLzpK2aMtaI0WwHp+xNf82ciBegapcIQOcVqrvRuyWNU8Z/96OhiceYZV01aZSzMOn0u6KLUPAzNDPu+37kAmfcDIOPhBLpgyHS4giEZH9yDuSg9NzWBp4ToSh3GR9RzgXzvm8NSusfSwsXAcKjpU1Aj3/TLqMl5RKsQjHXls5qvUQwoN61yWPRzYC5g47o8iotaVxrL8tvGTBeXt5gLzJVn/VsBgamwa3OZeX/uXkAP4M4eN7/Uof4B761s+UM7AxAAAAAASUVORK5CYII="
-                  alt="Logout"
-                  className="nav-icon"
-                />
-                Backlog
-              </button>
-            </a>
+            {routes.map((route) => {
+              return (
+                <a
+                  className={`nav-link ${
+                    window.location.href.includes(`${route.path}`)
+                      ? "active-link"
+                      : ""
+                  }`}
+                  href={`#${route.path}`}
+                  onClick={(e) => {
+                    document
+                      .querySelectorAll(".nav-link")
+                      .forEach((link) => link.classList.remove("active-link"));
+                    e.currentTarget.classList.add("active-link");
+                  }}
+                >
+                  <button className="sidenav-button">
+                    {route.icon()}
+                    {route.name}
+                  </button>
+                </a>
+              );
+            })}
           </div>
           <div className="content-container">{children}</div>
         </div>

@@ -35,10 +35,20 @@ const Chat: React.FC = () => {
   const [code, setCode] = React.useState<string | null>(null);
   const { triggerAlert } = useAlert();
   const { collections, error } = useFetchCollection();
-  const [age, setAge] = React.useState("");
+  const [codeLang, setCodeLang] = React.useState("");
   const urlParams = new URLSearchParams(window.location.hash.split("?")[1]);
   const taskId = urlParams.get("task");
   const [value, setValue] = React.useState<any>(null);
+
+  const getInstructions = (instructionForUserStories: string) => {
+    const config = JSON.parse(localStorage.getItem("config") || "{}");
+    const instructions = config[instructionForUserStories] || [];
+    const concatenatedInstructions = instructions.map(
+      (instruction: any, index: number) =>
+        `\n ${index + 1}: ${instruction.value}`
+    );
+    return concatenatedInstructions.join("");
+  };
 
   const getContext = async (query: string) => {
     const myHeaders = new Headers();
@@ -48,8 +58,8 @@ const Chat: React.FC = () => {
       query: query,
       collection_name: localStorage.getItem("selected_collection"),
       no_of_results: 3,
-      fine_chunking: true,
-      if_gpt_summarize: true,
+      fine_chunking: false,
+      if_gpt_summarize: false,
     });
 
     const requestOptions = {
@@ -112,7 +122,7 @@ const Chat: React.FC = () => {
   };
 
   const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value as string);
+    setCodeLang(event.target.value as string);
   };
 
   const callGpt = async (query: string): Promise<string | null> => {
@@ -162,9 +172,15 @@ const Chat: React.FC = () => {
     const effectiveContext = JSON.stringify(contextData?.results?.documents);
     // const effectiveContext = contextData?.results?.gpt_results;
     // const effectiveContext = contextData?.results?.fine_results;
+    const instructionForUserStories = getInstructions(
+      "instructionForUserStories"
+    );
     const userStorydata = await callGpt(`
         Write an elaborate agile user story in Gherkin format for ${query}
         Include Acceptance Criteria, Assumptions, and Dependencies
+       Follow the instructions:
+       ${instructionForUserStories}
+        
         Context of the story should be: ${effectiveContext}
         `);
     setUserStory(userStorydata);
@@ -173,9 +189,19 @@ const Chat: React.FC = () => {
 
   const generateTestCases = async () => {
     if (!userStory) return;
+
+    const instructionForTestCases = getInstructions("instructionForTestCases");
+
     const testcaseData = await callGpt(
-      userStory +
-        " generate test cases for for a JIRA Ticket of the above user story"
+      `
+      UserStory: 
+      ${userStory}
+
+      generate test cases for the above user story
+
+      Follow the instructions: 
+      ${instructionForTestCases}
+      `
     );
     setTestCase(testcaseData);
     testcaseData && localStorage.setItem("testcase", testcaseData);
@@ -183,9 +209,18 @@ const Chat: React.FC = () => {
 
   const generateTestData = async () => {
     if (!testCase) return;
+    const instructionForTestData = getInstructions("instructionForTestData");
+
     const testcaseData = await callGpt(
-      testCase +
-        " Generate the 10 sample sets of test data for the above test case in list view for a JIRA Ticket"
+      `
+      TestCase: 
+      ${testCase}
+
+       Generate sample sets of test data for the above TestCase in list view
+
+      Follow the instructions: 
+      ${instructionForTestData}
+      `
     );
     setTestData(testcaseData);
     testcaseData && localStorage.setItem("testdata", testcaseData);
@@ -193,9 +228,14 @@ const Chat: React.FC = () => {
 
   const generateCode = async () => {
     if (!testData) return;
-    const testCode = await callGpt(
-      `Generate sample codes example in ${age} for the  user story of :  ${userStory} \n that supports the bellow test cases\n ${testCase}`
-    );
+    const instructionForCode = getInstructions("instructionForCode");
+
+    const testCode = await callGpt(`
+      Generate sample codes example in ${codeLang} for the  user story of :  ${userStory} \n that supports the bellow test cases\n ${testCase}
+
+      Follow the instructions: 
+      ${instructionForCode}
+      `);
     setCode(testCode);
     testCode && localStorage.setItem("code", testCode);
   };
@@ -301,7 +341,7 @@ const Chat: React.FC = () => {
                     <Select
                       labelId="demo-simple-select-label"
                       id="demo-simple-select"
-                      value={age}
+                      value={codeLang}
                       label="Age"
                       onChange={handleChange}
                     >

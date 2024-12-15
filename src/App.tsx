@@ -10,6 +10,7 @@ import SimpleAlert from "./components/Alert";
 import UserStoryGeneration from "./pages/Code/UserStoryGeneration";
 import Backlog from "./pages/Code/Backlog";
 import Upload from "./pages/Upload";
+import Config from "./pages/Config";
 
 function App() {
   return (
@@ -17,11 +18,12 @@ function App() {
       <SimpleAlert />
       <Routes>
         {/* <Route path="/" element={<Home />} /> */}
-        <Route path="/" element={<Chat />} />
+        <Route path="/home" element={<Chat />} />
         <Route path="/query" element={<Queries />} />
         <Route path="/user-story" element={<UserStoryGeneration />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/backlog" element={<Backlog />} />
+        <Route path="/config" element={<Config />} />
       </Routes>
     </Layout>
   );
