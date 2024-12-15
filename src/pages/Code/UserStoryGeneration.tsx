@@ -216,7 +216,8 @@ const Chat: React.FC = () => {
       TestCase: 
       ${testCase}
 
-       Generate sample sets of test data for the above TestCase in list view
+       Generate a HTML code of sample sets of test data for the above TestCase 
+      
 
       Follow the instructions: 
       ${instructionForTestData}
@@ -264,7 +265,6 @@ const Chat: React.FC = () => {
   }, []);
 
   React.useEffect(() => {
-    console.log("============>", taskId);
     if (taskId) {
       const backlogData = localStorage.getItem("backlogData");
       if (backlogData) {
@@ -272,7 +272,7 @@ const Chat: React.FC = () => {
         const task = parsedData.find(
           (item: any) => item.id.toString() == taskId
         );
-        console.log("=======show=====>", taskId, parsedData, task);
+
         if (task) {
           localStorage.setItem("userStory", task.userStory);
           localStorage.setItem("testcase", task.testCase);
@@ -300,8 +300,12 @@ const Chat: React.FC = () => {
     localStorage.removeItem("testdata");
     localStorage.removeItem("code");
     localStorage.removeItem("contextData");
-
-    window.location.reload();
+    setUserStory(null);
+    setTestCase(null);
+    setTestData(null);
+    setCode(null);
+    setContextDataForStory(null);
+    window.location.href = "#/user-story";
   };
   return (
     <>
@@ -337,26 +341,40 @@ const Chat: React.FC = () => {
                 <p style={{ fontSize: 10, marginTop: 0 }}>
                   * Old data will be cleared on starting new
                 </p>
+
+                {taskId && (
+                  <div
+                    style={{
+                      width: "100%",
+                    }}
+                  >
+                    <span>
+                      Task id: <b>{taskId}</b>
+                    </span>
+                  </div>
+                )}
               </div>
 
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "flex-end",
-                  width: "100%",
-                }}
-              >
-                <AutoCompleteInput
-                  value={value}
-                  setValue={setValue}
-                  collections={collections?.collections}
-                />
+              {!taskId && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-end",
+                    width: "100%",
+                  }}
+                >
+                  <AutoCompleteInput
+                    value={value}
+                    setValue={setValue}
+                    collections={collections?.collections}
+                  />
 
-                <p style={{ fontSize: 10 }}>
-                  * generated data will be base on selected collection only
-                </p>
-              </div>
+                  <p style={{ fontSize: 10 }}>
+                    * generated data will be base on selected collection only
+                  </p>
+                </div>
+              )}
             </div>
           )}
           <WelcomeChatComp />
@@ -385,27 +403,32 @@ const Chat: React.FC = () => {
                   setTestData={setTestData}
                   generateTestData={generateTestData}
                 />
-                <Box sx={{ minWidth: 120 }}>
-                  <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">
-                      Select language
-                    </InputLabel>
-                    <Select
-                      labelId="demo-simple-select-label"
-                      id="demo-simple-select"
-                      value={codeLang}
-                      label="Age"
-                      onChange={handleChange}
-                    >
-                      <MenuItem value={"React JS"}>React JS</MenuItem>
-                      <MenuItem value={"Python"}>Python</MenuItem>
-                      <MenuItem value={"HTML"}>HTML</MenuItem>
-                      <MenuItem value={"Kotlin"}>Kotlin</MenuItem>
-                      <MenuItem value={"Apex"}>Apex (Salesforce)</MenuItem>
-                    </Select>
+
+                <FormControl fullWidth>
+                  <div style={{ display: "flex" }}>
+                    <div style={{ marginRight: 10 }}>
+                      <InputLabel id="demo-simple-select-label">
+                        Select language
+                      </InputLabel>
+                      <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={codeLang}
+                        label="Age"
+                        onChange={handleChange}
+                        size="small"
+                        style={{ width: "200px" }}
+                      >
+                        <MenuItem value={"React JS"}>React JS</MenuItem>
+                        <MenuItem value={"Python"}>Python</MenuItem>
+                        <MenuItem value={"HTML"}>HTML</MenuItem>
+                        <MenuItem value={"Kotlin"}>Kotlin</MenuItem>
+                        <MenuItem value={"Apex"}>Apex (Salesforce)</MenuItem>
+                      </Select>
+                    </div>
                     <button
                       className="newConversationButton"
-                      style={{ width: "130px" }}
+                      style={{ width: "130px", height: 30 }}
                       onClick={() => generateCode()}
                     >
                       Generate code
@@ -414,8 +437,8 @@ const Chat: React.FC = () => {
                         alt="Clear Chat"
                       />
                     </button>
-                  </FormControl>
-                </Box>
+                  </div>
+                </FormControl>
               </>
             )}
             {code && !loading && (
@@ -471,7 +494,7 @@ const Chat: React.FC = () => {
               <input
                 className="Input-Field"
                 type="text"
-                placeholder="How can I help you today?"
+                placeholder="Enter your query here"
                 id="query"
                 name="query"
               />

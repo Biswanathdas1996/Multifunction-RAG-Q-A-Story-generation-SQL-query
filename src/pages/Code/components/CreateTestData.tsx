@@ -44,7 +44,8 @@ const CreateTestData: React.FC<CreateTestDataProps> = ({
       ) : (
         <>
           <div className="chat-msg-list msg-hldr-cb gap10px pre-div ">
-            <BoldText text={testData} />
+            {/* <BoldText text={testData} /> */}
+            <div dangerouslySetInnerHTML={{ __html: testData }} />
           </div>
 
           <br />

@@ -27,11 +27,11 @@ const routes = [
     name: "Saved Query",
     icon: () => <SaveAsIcon style={iconStyle} />,
   },
-  {
-    path: "/user-story",
-    name: "Create New Story",
-    icon: () => <LibraryAddIcon style={iconStyle} />,
-  },
+  // {
+  //   path: "/user-story",
+  //   name: "Create New Story",
+  //   icon: () => <LibraryAddIcon style={iconStyle} />,
+  // },
   {
     path: "/backlog",
     name: "Story Backlog",

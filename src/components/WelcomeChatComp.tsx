@@ -4,7 +4,7 @@ const WelcomeChatComp: React.FC = () => {
   return (
     <>
       <div className="bot-details-card">
-        <h2>Welcome to the DRL, your Sales Rep. Intelligent Assistant!!</h2>
+        <h2>Welcome to the AI , your Sales Rep. Intelligent Assistant!!</h2>
         <p>I'm here to make your job easier by helping you with:</p>
         <div className="chat-menuHldr">
           <div className="mrl">

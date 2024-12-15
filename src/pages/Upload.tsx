@@ -41,6 +41,7 @@ const Upload: React.FC = () => {
   console.log(value?.title);
   return (
     <>
+      <h2>Upload Documents</h2>
       <div className="bot-details-card">
         <h2>Upload Your Documents</h2>
         <p>

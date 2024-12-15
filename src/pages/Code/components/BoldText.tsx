@@ -14,6 +14,10 @@ const BoldText: React.FC<BoldTextProps> = ({ text }) => {
         line.startsWith("Test Case ") ||
         line.startsWith("Scenario") ||
         line.startsWith("Feature") ||
+        line.startsWith("Assumptions") ||
+        line.startsWith("Dependencies") ||
+        line.startsWith("Background") ||
+        line.startsWith("Set") ||
         line.match(/^\d+\./)
       ) {
         return `**${line}**`;

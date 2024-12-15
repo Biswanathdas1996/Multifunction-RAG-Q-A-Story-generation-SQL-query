@@ -130,6 +130,7 @@ export default function Config() {
   ]);
   return (
     <div>
+      <h2>Configaration</h2>
       <Box sx={{ flexGrow: 1 }}>
         <Grid container spacing={2}>
           <Grid size={6}>
