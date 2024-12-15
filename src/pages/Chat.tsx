@@ -74,6 +74,7 @@ const Chat: React.FC = () => {
 
   return (
     <>
+      <h2>Chat</h2>
       <div className="chat-hldr">
         <div className="chat-scrollhldr">
           <WelcomeChatComp />

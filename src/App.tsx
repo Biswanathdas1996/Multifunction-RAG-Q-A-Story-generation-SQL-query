@@ -20,7 +20,8 @@ function App() {
         {/* <Route path="/" element={<Home />} /> */}
         <Route path="/home" element={<Chat />} />
         <Route path="/query" element={<Queries />} />
-        <Route path="/user-story" element={<UserStoryGeneration />} />
+        <Route path="/story" element={<UserStoryGeneration />} />
+        <Route path="/backlog/story" element={<UserStoryGeneration />} />
         <Route path="/upload" element={<Upload />} />
         <Route path="/backlog" element={<Backlog />} />
         <Route path="/config" element={<Config />} />

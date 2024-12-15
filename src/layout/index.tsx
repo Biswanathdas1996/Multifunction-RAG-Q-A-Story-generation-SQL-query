@@ -10,6 +10,12 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 
+import Typography from "@mui/material/Typography";
+import Breadcrumbs from "../components/Bredcumbs";
+import Link from "@mui/material/Link";
+
+import { useLocation } from "react-router-dom";
+
 const iconStyle = {
   //  color: "#d04a02",
   color: "black",
@@ -45,7 +51,7 @@ const routes = [
   },
   {
     path: "/config",
-    name: "Config",
+    name: "Configaration",
     icon: () => <SettingsIcon style={iconStyle} />,
   },
 ];
@@ -58,11 +64,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <div className="chatbot-page">
         <div className="header-container">
           <div className="logoDiv">
-            <img
-              className="logoHP"
-              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQwAAAAlCAYAAAC3WNfZAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAouSURBVHgB7Z1fXtu6Esd/Drw35/3cIsq5z6QrqFlBYQWEFQArwF0BYQWkK4CuIO4KSJ8vNEp735vzXuKjiWeQIvLHAZL00zPfz0cf25I8GkvWaCQ7ToI1srNlrooCX2ZkqdeGuL79v82hKMra2cQaccbCDofIp6VvJDDDGhrmT0Oadq21AyiKsjbWajAS4I/NGRoUABmI+mYN6X2S9FAeK4qyJtbrYQD2zk6fbhjH5k8MCudprFdTRVGIBGukyhqGU/CV07Lu8vUReBhJge7dd3sNRVFWxrrXML58/WazaensYRjyML5+t+0wbec/pglFUVZKDYqiKBVRg6EoSmXUYCiKUpl1P1bditci3HrFrlvXOIWiKL8c636s2o8XM9+8NhkURfklWftjVQzxaSyyhvcS57yNutsY2nXx/eQ+eHErwTsX+zlJsHX7zX6AoihLZ/2PVR97GA+PUMPHqsMk6Xz93utLPjeVwZ3Lpx6JoqwOXfRUFKUyajAURanM0tYwaDoxL8/GEBn9niSMc2sSu8Hr4uWr4aM3wUfrF34No+bS7tF1V5DefbNNKIqydJZmMNyCZjEvz7CWmF7Pr0soivJro1MSRVEqs7SnJPcJtuflsepdKIqiKMrvyVpf3PoFSF1ouEAviHVdWOT7GnU+1yJauH0hDIcYi+WUN4uUtzmWh+FgOcgxtQstdoftpF9eU1bOGUZvp48F+gygqXh+yudkWA5tPNZPwiFWi5RbFerYHRfOFzgn4zKafNzm45SPO3y8hdVxzuXOK/MSpW4dvCyLXvMJh5dkH2XbGPyLSeENRINDi+OqehkpVmMwWlxWCq/jD6yWRQ2GweIdKMNsg9EI9ldFlQ5rMG7MU7wcTZT1Uq+Yv8fhJWkjuK6HRU/zp0lrNTSSApY+fcfHKR3fbyC3jlAKpdNXvV3atXzNm9692LgvBd/x693/NaZxP8Q+y23H5aFsjL+HBbp2dZ/cM7y1KF1cIkPp6togH1nXY84/4LwfMH1KQNdzHuS/QFnhRJ1lNYOySVaO2XSDPDnLiG+gs0BuHunYgXfjmxP0egqXrEOOckQjmddcboPTwftU/h4fp6yrYf0uUN1AH7I86hB9Lp9k7XP5ZEybLnyEv7awPWyU1mSZpMNxkOeIt5d8PvicabqmvM3hDXsepNe5rF3W8wvG657yv+d8fU6zmMwsWRn8fZEFcmadQ9e3z9dF++9Yhxb8/bLLeQ9Hst68Nuc7W+YHvTfBocOhCEKPjMFfrpNz2kP+7e3tB+u789pcSrzEbb82bYlzIhou1Mfkl+eM5L3ZMjdYDVSJNErLaH3FlWOCPAbeC6E0Gd2lM6QY9zAMy+pxXA/jI46cLzd2j/NPGz3anF9uZoNxz0g4D/Rqs8xwZJeR7ybSax/ViT0M0f2Gy5W6TFnPVqBnxuc0puiRcnqGxaYkMg24jORJeaZieT9Y3xuMt+9JcE4L3njEyHkNlhV7f6LnFQfaP4907HE+qVcz5Zp7gY6SdhLklXbosD4mkHkZ6JrxOU34OvoRnQ++7l6Q54Tew/gbfpSlFPrg7me38zG4aLNR4PLnJmyR4FMxwQKOvmuRPDT2RDZ/ou7kUKWldJwkOL37Zo8KXsRyK7ANMkpYPlTeW+DhGqnzSIOFc0AabQ5Q3rw5x5kpMs9Qdv4jzn8QxAPeMFDjW5Sj7gHmI41GocO67wW6nMB7FRnK0SLFuGs84LIy1o84xvOos0ySdxHoY1ln8H7G+9JJ6Fsnbd4Sh3ha2U14jyALdBDOovLi9hCo3k6CdMPbFvx9Trp38ZgGh5zTu6xbGuQRD+iUy6BtP0gjruHvtQtMHkTkl9uWdd7j7YDT9+A95L1Al5xlSyDeRbLpvD9c2IZfYCaoXj7zPundqtFHeEcGgqGvcVMcvW5NHToQmpKwr9a2Jn3pu6g9aogYyz9XT0XJWycrzkRGCcvH8LaJsqKogsV4SMeniqPOLaPCZUWZ1Kmpc99E8RnKxtsP8hxi/op/G76xr+E7Syg7hTcqcRowPtXKJ6Q/FRttZ2F4K9d+xccpFkc6VHgfdueUF7eHIPVvsTjHQdkpvA5hXxADIDqQiy9Tm2sulzomje7nGJ8mx3pewHsNJIvuzxzTITl0X5OBoPruTMn3OShjgBlrJjPf9PwZzXOdh9CYlO+NMWcJeSYTKr2WjH4LYu8T7DmDkQZJD5UydGnOvThwBmovXitZEhnGvYkcfsSiynrFeSjQtznEqMxCbjzyXLY5xF7EUSCry2U258ilxmzDGw7iMCrzU1DmW5Z/HcgIbwATnbsqLG9n1U9VRPdwpNydkuclyptGylu6jzrw9xP1k3A9gcqWtZEmys5e52PRizq2gZ9iTYLk0/WcBrKmGQEE6SnKe+QIz2Smwajy14RFUWw7ryRz4SKJDAZ/fm/fGYNTMgRFcOOG+5R2Z+31rV3Zf6i2eUsjATVCE2VDGZTX0IfXT+rg/RyZnwKZBmWn7sAbBBo9yEilKI2FjeRXQUYAw8ci5x38OyUyvw2NRJ31SuFHP/GomqjmQT2FBvz1S/1QvRiUo7PMtReF6iBHeV2yjtKK8sxrj0U4wmPPpMlxZND3ghB6geJZUNu3URormSoQGfx6FN2H4tFPGuEb8F5pi2VN8gbq8HWa8vYDnrfITRiSPdNgxL84ddOFR66SW5OgBrG30f+LjM6t4dwZkg9kDCguqfnzab2CFkCxHnKUjUMVTo1JN1yT48WTkDksXR+5iynHT9O5jbJh9lHemBnLyzhdRoUrlkf5FnlKIIiB2eKtzF0vWbaBH83Cc0SvJuvVwvKw8B1aDBGVR9cbjsZktNp4Ggd8vnSaePRsY3Z7VCE0OmmU9j4oJw/CRZA+YB1JB5lGNDjPAP7aOxwu4Z/4xFDfIeN0wnJIXh3jazcW3oim8PfWOcfJOtIi/U76LOl2ntAefbXKTQfKkadAmxYiR/HGHLsO34rj6cmHm2qIW0zTjrf/s7ZLTz9Y0dHfIDrh3bu+fXAB/zImdesf3oUKZBL0qJWe867439rFGltMHu0N4p/Wz6YOvwYyTR4WlLlIuTaKL+BdX8NxFqsh9tIkblb9VIXuS5o6iuFvorypZdE5xDyzPIPHdZbyNo/iwxE+D/JKXDc6x8AvnlqUnVz0lKlNHpU7TRaxH5xj4RfARXYD/hUBg/G3a0U+JpRJ+bqPDYYTej/ER2cEdl1cRhHujuu6dYYDWV8YMxhBpw8NBnjdIl6TcEaDFlnDRaGRsq4Mk5BSQxzdRZ/tU55FaDB+J07gFwkppLylOf5LGmIlYNKvVeWFKiKnx6hDZ7HD9QzXsQe8wDkY1kZu34hhgb4zMna0P2UB061TZDvGWGc0jhP/rJg+lNN1ZV0MNxZ20ZXZkDH/HTsQeRg0SqZ8TK5/ODory4I8jPBFKiiKokxAP6CjKEplxGC8eohJFlpBVRTlX0RCv99IJjwL1+9tKooS8w8HcPFRR01I2QAAAABJRU5ErkJggg=="
-              alt="PwC Logo"
-            />
+            <h2 style={{ color: "black", fontWeight: 500, fontSize: 20 }}>
+              Intelligent{" "}
+              <b style={{ color: "#d04a02", fontWeight: 700 }}>Assitant</b>
+            </h2>
           </div>
           <div className="userDiv">
             <img
@@ -102,9 +107,31 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               );
             })}
           </div>
-          <div className="content-container">{children}</div>
+          <div className="content-container">
+            <div>
+              <Breadcrumbs routes={routes} />
+
+              {children}
+            </div>
+          </div>
         </div>
       </div>
+      {/* <footer
+        style={{
+          backgroundColor: "black",
+          color: "white",
+          width: "100%",
+          textAlign: "center",
+          padding: "10px 0",
+          // position: "fixed",
+          bottom: 0,
+          // height: 100,
+        }}
+      >
+        <Typography variant="body2" color="inherit">
+          © 2023 Your Company. All rights reserved.
+        </Typography>
+      </footer> */}
     </div>
   );
 };

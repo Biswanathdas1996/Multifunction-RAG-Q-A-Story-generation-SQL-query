@@ -305,7 +305,7 @@ const Chat: React.FC = () => {
     setTestData(null);
     setCode(null);
     setContextDataForStory(null);
-    window.location.href = "#/user-story";
+    window.location.href = "#/story";
   };
   return (
     <>

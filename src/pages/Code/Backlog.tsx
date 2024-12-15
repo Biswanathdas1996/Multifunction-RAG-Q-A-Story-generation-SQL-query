@@ -28,7 +28,7 @@ const Backlog: React.FC = () => {
     localStorage.removeItem("code");
     localStorage.removeItem("contextData");
 
-    window.location.href = "#/user-story";
+    window.location.href = "#/story";
   };
 
   const viewTicket = (id: number) => {
@@ -37,7 +37,7 @@ const Backlog: React.FC = () => {
     localStorage.removeItem("testdata");
     localStorage.removeItem("code");
     localStorage.removeItem("contextData");
-    window.location.href = `#/user-story?task=${id}`;
+    window.location.href = `#/backlog/story?task=${id}`;
   };
 
   const deleteTicket = (id: number) => {
