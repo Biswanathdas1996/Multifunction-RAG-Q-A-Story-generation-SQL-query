@@ -18,6 +18,12 @@ const BoldText: React.FC<BoldTextProps> = ({ text }) => {
         line.startsWith("Dependencies") ||
         line.startsWith("Background") ||
         line.startsWith("Set") ||
+        line.startsWith("Device Compatibility") ||
+        line.startsWith("User Role") ||
+        line.startsWith("Stage") ||
+        line.startsWith("Sub-stage") ||
+        line.startsWith("Applicable BU") ||
+        line.startsWith("Proposed") ||
         line.match(/^\d+\./)
       ) {
         return `**${line}**`;

@@ -180,8 +180,8 @@ const Chat: React.FC = () => {
     const userStorydata = await callGpt(`
         Write an elaborate agile user story in Gherkin format for ${query}
         Include Acceptance Criteria, Assumptions, and Dependencies
-       Follow the instructions:
-       ${instructionForUserStories}
+        ${instructionForUserStories}
+       
         
         Context of the story should be: ${effectiveContext}
         `);
@@ -379,7 +379,7 @@ const Chat: React.FC = () => {
               )}
             </div>
           )}
-
+          <WelcomeChatComp />
           <div className="chat-msg">
             <ViewStory
               taskId={taskId}
@@ -412,10 +412,15 @@ const Chat: React.FC = () => {
                       setTestData={setTestData}
                       generateTestData={generateTestData}
                     />
-
+                  </>
+                )
+              }
+              codeData={() => (
+                <>
+                  {testData && (
                     <FormControl fullWidth>
                       <div style={{ display: "flex" }}>
-                        <div style={{ marginRight: 10 }}>
+                        <div style={{ marginRight: 10, padding: 7 }}>
                           <InputLabel id="demo-simple-select-label">
                             Select language
                           </InputLabel>
@@ -426,7 +431,7 @@ const Chat: React.FC = () => {
                             label="Age"
                             onChange={handleChange}
                             size="small"
-                            style={{ width: "200px" }}
+                            style={{ width: "300px" }}
                           >
                             <MenuItem value={"React JS"}>React JS</MenuItem>
                             <MenuItem value={"Python"}>Python</MenuItem>
@@ -439,7 +444,7 @@ const Chat: React.FC = () => {
                         </div>
                         <button
                           className="newConversationButton"
-                          style={{ width: "130px", height: 30 }}
+                          style={{ width: "130px" }}
                           onClick={() => generateCode()}
                         >
                           Generate code
@@ -450,52 +455,49 @@ const Chat: React.FC = () => {
                         </button>
                       </div>
                     </FormControl>
-                  </>
-                )
-              }
-              codeData={() =>
-                code &&
-                !loading && (
-                  <>
-                    <h2>Generated Code</h2>
+                  )}
+                  {code && !loading && (
+                    <>
+                      <h2>Generated Code</h2>
 
-                    <AceEditor
-                      mode="javascript"
-                      theme="monokai"
-                      value={code}
-                      onChange={(newValue) => {
-                        setCode(newValue);
-                        localStorage.setItem("code", newValue);
-                      }}
-                      setOptions={{
-                        useWorker: false,
-                      }}
-                      editorProps={{ $blockScrolling: true }}
-                      //   height="400px"
-                      width="100%"
-                      style={{ padding: 10, borderRadius: 15 }}
-                    />
+                      <AceEditor
+                        mode="javascript"
+                        theme="monokai"
+                        value={code}
+                        onChange={(newValue) => {
+                          setCode(newValue);
+                          localStorage.setItem("code", newValue);
+                        }}
+                        setOptions={{
+                          useWorker: false,
+                        }}
+                        editorProps={{ $blockScrolling: true }}
+                        //   height="400px"
+                        width="100%"
+                        style={{ padding: 10, borderRadius: 15 }}
+                      />
 
-                    <br />
+                      <br />
 
-                    <div
-                      style={{ display: "flex", justifyContent: "flex-end" }}
-                    >
-                      <button
-                        className="newConversationButton"
-                        style={{ width: "130px" }}
-                        onClick={() => saveDataToLocalStorage()}
+                      <div
+                        style={{ display: "flex", justifyContent: "flex-end" }}
                       >
-                        {taskId ? "Update" : "Save"}
-                        <img
-                          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
-                          alt="Clear Chat"
-                        />
-                      </button>
-                    </div>
-                  </>
-                )
-              }
+                        <button
+                          className="newConversationButton"
+                          style={{ width: "130px" }}
+                          onClick={() => saveDataToLocalStorage()}
+                        >
+                          {taskId ? "Update" : "Save"}
+                          <img
+                            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
+                            alt="Clear Chat"
+                          />
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
               referance={() =>
                 contextDataForStory && (
                   <ContextData data={contextDataForStory} />

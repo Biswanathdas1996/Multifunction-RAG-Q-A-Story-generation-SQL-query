@@ -53,7 +53,7 @@ export default function CheckboxList({ collections }: any) {
                   <ListItemIcon>
                     <LibraryBooksIcon />
                   </ListItemIcon>
-                  <ListItemText id={labelId} primary={`${value + 1}`} />
+                  <ListItemText id={labelId} primary={`${value}`} />
                 </ListItemButton>
               </ListItem>
             </>

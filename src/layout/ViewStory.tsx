@@ -24,12 +24,12 @@ export default function BasicGrid({
   return (
     <Box sx={{ flexGrow: 1 }} style={{ fontSize: 11 }}>
       <Grid container spacing={2}>
+        <Grid size={12}>{referance()}</Grid>
         <Grid size={taskId ? 7 : 12}>{userStory()}</Grid>
         {taskId && <Grid size={taskId ? 5 : 12}>{welcomeCompontent()}</Grid>}
         <Grid size={taskId ? 7 : 12}>{testCase()}</Grid>
         <Grid size={taskId ? 5 : 12}>{testData()}</Grid>
         <Grid size={taskId ? 7 : 12}>{codeData()}</Grid>
-        <Grid size={12}>{referance()}</Grid>
       </Grid>
     </Box>
   );
