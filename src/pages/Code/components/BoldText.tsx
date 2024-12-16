@@ -24,6 +24,7 @@ const BoldText: React.FC<BoldTextProps> = ({ text }) => {
         line.startsWith("Sub-stage") ||
         line.startsWith("Applicable BU") ||
         line.startsWith("Proposed") ||
+        line.startsWith("###") ||
         line.match(/^\d+\./)
       ) {
         return `**${line}**`;
