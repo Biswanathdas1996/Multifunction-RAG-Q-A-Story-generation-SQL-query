@@ -8,6 +8,9 @@ from vector_db.vector_db import delete_collection, upload_files, list_collection
 from vector_db.fine_chunking import fine_chunking
 import os
 
+from gimini.llm import extract_img
+
+
 if __name__ == "__main__":
     
     app = Flask(__name__)
@@ -15,7 +18,9 @@ if __name__ == "__main__":
     CORS(app)
 
     app.config['UPLOAD_FOLDER'] = 'vector_db/uploads'
+    app.config['IMG_UPLOAD_FOLDER'] = 'gimini/uploads'
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs(app.config['IMG_UPLOAD_FOLDER'], exist_ok=True)
 
     @app.route('/query-mock', methods=['POST'])
     def query_mock():
@@ -215,6 +220,19 @@ def delete_collection():
     return jsonify({"collections": result}), 200
 
 
+
+@app.route('/extract-img', methods=['POST'])
+def extract_img_api():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file provided"}), 400
+    file = request.files['file']
+    file_path = os.path.join(app.config['IMG_UPLOAD_FOLDER'], file.filename)
+    file.save(file_path)
+    try:
+        img_details = extract_img(file_path)
+        return jsonify({"details": img_details}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
         app.run(debug=True)

@@ -8,6 +8,7 @@ export const SAVE_QUERY = `${BASE_URL}/save-query`;
 export const CALL_GPT = `${BASE_URL}/call-gpt`;
 export const UPLOAD_DOC = `${BASE_URL}/upload`;
 export const COLLECTIONS = `${BASE_URL}/collection`;
+export const EXTRACT_IMAGE_TO_TEXT = `${BASE_URL}/extract-img`;
 export const SEARCH = `${BASE_URL}/search`;
 export const ANALITICS = USE_MOCK
   ? `${BASE_URL}/analitics-mock`

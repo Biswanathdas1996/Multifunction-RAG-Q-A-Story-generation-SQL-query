@@ -11,27 +11,39 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useAlert } from "../../hook/useAlert";
 import AceEditor from "react-ace";
-import { CALL_GPT, SEARCH } from "../../config";
+import { CALL_GPT, SEARCH, EXTRACT_IMAGE_TO_TEXT } from "../../config";
 // Import a theme and language
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/worker-javascript";
 import "ace-builds/src-noconflict/theme-monokai";
-
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import RateReviewIcon from "@mui/icons-material/RateReview";
 import CreateUserStory from "./components/CreateUserStory";
 import CreateTestCases from "./components/CreateTestCases";
 import CreateTestData from "./components/CreateTestData";
-
+import TextFieldsIcon from "@mui/icons-material/TextFields";
 import AutoCompleteInput from "../../components/AutoCompleteInput";
 import { useFetchCollection } from "../../hook/useFetchCollection";
 import ContextData from "./components/ContextData";
-
+import BoldText from "./components/BoldText";
 import ViewStory from "../../layout/ViewStory";
 
 const Chat: React.FC = () => {
   const [loading, setLoading] = React.useState(false);
+
+  const [imageUploadLoading, setImageUploadLoading] = React.useState(false);
+  const [userStoryLoading, setUserStoryLoading] = React.useState(false);
+  const [testCaseLoading, setTestCaseLoading] = React.useState(false);
+  const [testDataLoading, setTestDataLoading] = React.useState(false);
+  const [codeLoading, setCodeLoading] = React.useState(false);
+
+  const [userQuery, setUserQuery] = React.useState<string | null>(null);
   const [userStory, setUserStory] = React.useState<string | null>(null);
   const [testCase, setTestCase] = React.useState<string | null>(null);
   const [testData, setTestData] = React.useState<string | null>(null);
+  const [file, setFile] = React.useState<File | null>(null);
+  const [uploadFile, setUploadFile] = React.useState<boolean>(false);
+
   const [contextDataForStory, setContextDataForStory] =
     React.useState<any>(null);
   const [code, setCode] = React.useState<string | null>(null);
@@ -41,6 +53,12 @@ const Chat: React.FC = () => {
   const urlParams = new URLSearchParams(window.location.hash.split("?")[1]);
   const taskId = urlParams.get("task");
   const [value, setValue] = React.useState<any>(null);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      setFile(event.target.files[0]);
+    }
+  };
 
   const getInstructions = (instructionForUserStories: string) => {
     const config = JSON.parse(localStorage.getItem("config") || "{}");
@@ -85,6 +103,7 @@ const Chat: React.FC = () => {
       {
         id: new Date().getTime(),
         sprint: "backlog",
+        userQuery,
         userStory,
         testCase,
         testData,
@@ -106,6 +125,7 @@ const Chat: React.FC = () => {
             ...parsedData[taskIndex],
             userStory,
             testCase,
+            userQuery,
             testData,
             code,
           };
@@ -151,10 +171,39 @@ const Chat: React.FC = () => {
     return response;
   };
 
-  const onsubmitHandler = async (e: any) => {
+  const handleUpload = (e: any) => {
     e.preventDefault();
-    const query = e.target.query.value;
+    if (!file) {
+      console.error("No file selected");
+      return;
+    }
+
+    setLoading(true);
+    const formdata = new FormData();
+    formdata.append("file", file);
+
+    const requestOptions = {
+      method: "POST",
+      body: formdata,
+      redirect: "follow" as RequestRedirect,
+    };
+
+    fetch(EXTRACT_IMAGE_TO_TEXT, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result);
+        generateUserStory(result?.details);
+      })
+      .catch((error) => {
+        console.error(error);
+        setLoading(false);
+      });
+  };
+
+  const generateUserStory = async (query: string) => {
     if (query.length === 0) return;
+    setUserQuery(query);
+    setUserStoryLoading(true);
     const contextData = await getContext(query);
     // console.log(
     //   "=========fine_results=========>",
@@ -169,6 +218,7 @@ const Chat: React.FC = () => {
     //   contextData?.results?.results?.documents
     // );
 
+    localStorage.setItem("userQuery", query as string);
     localStorage.setItem("contextData", JSON.stringify(contextData));
     setContextDataForStory(contextData);
     const effectiveContext = JSON.stringify(contextData?.results?.documents);
@@ -187,11 +237,19 @@ const Chat: React.FC = () => {
         `);
     setUserStory(userStorydata);
     userStorydata && localStorage.setItem("userStory", userStorydata);
+    setUserStoryLoading(false);
+  };
+
+  const onsubmitHandler = async (e: any) => {
+    e.preventDefault();
+
+    const query = e.target.query.value;
+    generateUserStory(query);
   };
 
   const generateTestCases = async () => {
     if (!userStory) return;
-
+    setTestCaseLoading(true);
     const instructionForTestCases = getInstructions("instructionForTestCases");
 
     const testcaseData = await callGpt(
@@ -207,9 +265,11 @@ const Chat: React.FC = () => {
     );
     setTestCase(testcaseData);
     testcaseData && localStorage.setItem("testcase", testcaseData);
+    setTestCaseLoading(false);
   };
 
   const generateTestData = async () => {
+    setTestDataLoading(true);
     if (!testCase) return;
     const instructionForTestData = getInstructions("instructionForTestData");
 
@@ -227,10 +287,12 @@ const Chat: React.FC = () => {
     );
     setTestData(testcaseData);
     testcaseData && localStorage.setItem("testdata", testcaseData);
+    setTestDataLoading(false);
   };
 
   const generateCode = async () => {
     if (!testData) return;
+    setCodeLoading(true);
     const instructionForCode = getInstructions("instructionForCode");
 
     const testCode = await callGpt(`
@@ -241,12 +303,14 @@ const Chat: React.FC = () => {
       `);
     setCode(testCode);
     testCode && localStorage.setItem("code", testCode);
+    setCodeLoading(false);
   };
 
   React.useEffect(() => {
     const savedUserStory = localStorage.getItem("userStory");
     const savedTestcase = localStorage.getItem("testcase");
     const savedTestData = localStorage.getItem("testdata");
+    const userQueryData = localStorage.getItem("userQuery");
     const testCode = localStorage.getItem("code");
     const contextDataStore = localStorage.getItem("contextData");
     if (savedUserStory) {
@@ -264,6 +328,9 @@ const Chat: React.FC = () => {
     if (contextDataStore) {
       setContextDataForStory(JSON.parse(contextDataStore));
     }
+    if (userQueryData) {
+      setUserQuery(userQueryData);
+    }
   }, []);
 
   React.useEffect(() => {
@@ -279,6 +346,7 @@ const Chat: React.FC = () => {
           localStorage.setItem("userStory", task.userStory);
           localStorage.setItem("testcase", task.testCase);
           localStorage.setItem("testdata", task.testData);
+          localStorage.setItem("userQuery", task.userQuery);
           localStorage.setItem("code", task.code);
           if (task?.contextData)
             localStorage.setItem(
@@ -290,6 +358,7 @@ const Chat: React.FC = () => {
           setTestCase(task.testCase);
           setTestData(task.testData);
           setCode(task.code);
+          setUserQuery(task.userQuery);
           setContextDataForStory(task.contextData);
         }
       }
@@ -302,13 +371,16 @@ const Chat: React.FC = () => {
     localStorage.removeItem("testdata");
     localStorage.removeItem("code");
     localStorage.removeItem("contextData");
+    localStorage.removeItem("userQuery");
     setUserStory(null);
     setTestCase(null);
     setTestData(null);
     setCode(null);
     setContextDataForStory(null);
+    setUserQuery(null);
     window.location.href = "#/story";
   };
+
   return (
     <>
       <div className="chat-hldr">
@@ -384,34 +456,66 @@ const Chat: React.FC = () => {
             <ViewStory
               taskId={taskId}
               welcomeCompontent={() => userStory && <WelcomeChatComp />}
+              userQuery={() =>
+                userQuery && (
+                  <div>
+                    <h2
+                      style={{
+                        marginBottom: 25,
+                      }}
+                    >
+                      User Query
+                    </h2>
+                    <div className="chat-msg-list msg-hldr-cb gap10px pre-div ">
+                      <BoldText text={userQuery} />
+                    </div>
+                  </div>
+                )
+              }
               userStory={() =>
                 userStory && (
-                  <CreateUserStory
-                    userStory={userStory}
-                    setUserStory={setUserStory}
-                    testCase={testCase}
-                    generateTestCases={generateTestCases}
-                  />
+                  <>
+                    {!userStoryLoading ? (
+                      <CreateUserStory
+                        userStory={userStory}
+                        setUserStory={setUserStory}
+                        testCase={testCase}
+                        generateTestCases={generateTestCases}
+                      />
+                    ) : (
+                      <Loader />
+                    )}
+                  </>
                 )
               }
               testCase={() =>
                 testCase && (
-                  <CreateTestCases
-                    testCase={testCase}
-                    setTestCase={setTestCase}
-                    generateTestCases={generateTestCases}
-                    generateTestData={generateTestData}
-                  />
+                  <>
+                    {!testCaseLoading ? (
+                      <CreateTestCases
+                        testCase={testCase}
+                        setTestCase={setTestCase}
+                        generateTestCases={generateTestCases}
+                        generateTestData={generateTestData}
+                      />
+                    ) : (
+                      <Loader />
+                    )}
+                  </>
                 )
               }
               testData={() =>
                 testData && (
                   <>
-                    <CreateTestData
-                      testData={testData}
-                      setTestData={setTestData}
-                      generateTestData={generateTestData}
-                    />
+                    {!testDataLoading ? (
+                      <CreateTestData
+                        testData={testData}
+                        setTestData={setTestData}
+                        generateTestData={generateTestData}
+                      />
+                    ) : (
+                      <Loader />
+                    )}
                   </>
                 )
               }
@@ -460,22 +564,26 @@ const Chat: React.FC = () => {
                     <>
                       <h2>Generated Code</h2>
 
-                      <AceEditor
-                        mode="javascript"
-                        theme="monokai"
-                        value={code}
-                        onChange={(newValue) => {
-                          setCode(newValue);
-                          localStorage.setItem("code", newValue);
-                        }}
-                        setOptions={{
-                          useWorker: false,
-                        }}
-                        editorProps={{ $blockScrolling: true }}
-                        //   height="400px"
-                        width="100%"
-                        style={{ padding: 10, borderRadius: 15 }}
-                      />
+                      {!codeLoading ? (
+                        <AceEditor
+                          mode="javascript"
+                          theme="monokai"
+                          value={code}
+                          onChange={(newValue) => {
+                            setCode(newValue);
+                            localStorage.setItem("code", newValue);
+                          }}
+                          setOptions={{
+                            useWorker: false,
+                          }}
+                          editorProps={{ $blockScrolling: true }}
+                          //   height="400px"
+                          width="100%"
+                          style={{ padding: 10, borderRadius: 15 }}
+                        />
+                      ) : (
+                        <Loader />
+                      )}
 
                       <br />
 
@@ -512,27 +620,75 @@ const Chat: React.FC = () => {
         <br />
 
         {!userStory && (
-          <form
-            onSubmit={(e) => onsubmitHandler(e)}
-            style={{ gridColumn: "span 4", marginBottom: "20px" }}
-          >
-            <div className="Input-Container">
-              <input
-                className="Input-Field"
-                type="text"
-                placeholder="Enter your query here"
-                id="query"
-                name="query"
-              />
-              <button className="Send-Button" type="submit">
-                <img
-                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAddJREFUaAXtmOFtwjAQRhmhI+RnFO47ZYSO0BEYgREYgQ3aTdoN2g3oBozQ9ipOOqwkOPjsGClIyHYI8Xtnn+Nks1k/awTWCFxFgIieAZwB/AB4bdu2uTqh9gaA0wVeBPT7OCIm+gpvy/pFiOhgIm/hbb1ekUsOWNipep0iAN4jRsGK1SWy3W73MwVUpg6Rvu+fbiSzAo+Vy4vcMY2GZJYTmZnMQ/D22DIiidPICmi9rEjkPUHh5pRlRJyn0ZBgfhGnZB6Ct8fyiSTcEyxgbN1f5HJPiAXwOs9XRHKBmfdEdATwwcz6vOAFPHYdXxH7LCMjU1Asn4iVknpOMcnHsL9ibSexczHgsKOmaf6nnERRcomIZMs+K5eY+RRe173tATq0lRd4yTk34FygIbyAA9glgYt5ytCHUDFtF3CxlvdCMR16neMGrkPWdd3OC27qOu7gKkBEn1Mdp/6WDTz39MkKrtEH8JYa4fD/RcCNwNB70rGN1+TxouAiAOAljN497eLgJvpJ00e23Mx8kD2QXrNYmbL2LwquEbpn7a8CXAXmrP1VgYtA7PSpDlyjf2vtrxZcBcamT/XgKhC+yHoYcBXouq7/u4l9MfP3Yuu4wqzlGoE1Ajcj8AvY+lHSUC3vMgAAAABJRU5ErkJggg=="
-                  alt="Send"
-                  className="Send-Icon"
-                />
-              </button>
-            </div>
-          </form>
+          <>
+            {!uploadFile ? (
+              <form
+                onSubmit={(e) => onsubmitHandler(e)}
+                style={{ gridColumn: "span 4", marginBottom: "20px" }}
+              >
+                <div className="Input-Container">
+                  {!file && (
+                    <input
+                      className="Input-Field"
+                      type="text"
+                      placeholder="Enter your query here"
+                      id="query"
+                      name="query"
+                    />
+                  )}
+
+                  <button className="Send-Button" type="submit">
+                    <img
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAddJREFUaAXtmOFtwjAQRhmhI+RnFO47ZYSO0BEYgREYgQ3aTdoN2g3oBozQ9ipOOqwkOPjsGClIyHYI8Xtnn+Nks1k/awTWCFxFgIieAZwB/AB4bdu2uTqh9gaA0wVeBPT7OCIm+gpvy/pFiOhgIm/hbb1ekUsOWNipep0iAN4jRsGK1SWy3W73MwVUpg6Rvu+fbiSzAo+Vy4vcMY2GZJYTmZnMQ/D22DIiidPICmi9rEjkPUHh5pRlRJyn0ZBgfhGnZB6Ct8fyiSTcEyxgbN1f5HJPiAXwOs9XRHKBmfdEdATwwcz6vOAFPHYdXxH7LCMjU1Asn4iVknpOMcnHsL9ibSexczHgsKOmaf6nnERRcomIZMs+K5eY+RRe173tATq0lRd4yTk34FygIbyAA9glgYt5ytCHUDFtF3CxlvdCMR16neMGrkPWdd3OC27qOu7gKkBEn1Mdp/6WDTz39MkKrtEH8JYa4fD/RcCNwNB70rGN1+TxouAiAOAljN497eLgJvpJ00e23Mx8kD2QXrNYmbL2LwquEbpn7a8CXAXmrP1VgYtA7PSpDlyjf2vtrxZcBcamT/XgKhC+yHoYcBXouq7/u4l9MfP3Yuu4wqzlGoE1Ajcj8AvY+lHSUC3vMgAAAABJRU5ErkJggg=="
+                      alt="Send"
+                      className="Send-Icon"
+                    />
+                  </button>
+                  <button
+                    className="Send-Button"
+                    type="button"
+                    onClick={() => {
+                      setUploadFile(!uploadFile);
+                      document.getElementById("query_img")?.click();
+                    }}
+                  >
+                    <AttachFileIcon />
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form
+                onSubmit={(e) => handleUpload(e)}
+                style={{ gridColumn: "span 4", marginBottom: "20px" }}
+              >
+                <div className="Input-Container">
+                  <input
+                    className="Input-Field"
+                    type="file"
+                    placeholder="Enter your query here"
+                    id="query_img"
+                    name="query_img"
+                    onChange={handleFileChange}
+                  />
+
+                  <button className="Send-Button" type="submit">
+                    <img
+                      src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAddJREFUaAXtmOFtwjAQRhmhI+RnFO47ZYSO0BEYgREYgQ3aTdoN2g3oBozQ9ipOOqwkOPjsGClIyHYI8Xtnn+Nks1k/awTWCFxFgIieAZwB/AB4bdu2uTqh9gaA0wVeBPT7OCIm+gpvy/pFiOhgIm/hbb1ekUsOWNipep0iAN4jRsGK1SWy3W73MwVUpg6Rvu+fbiSzAo+Vy4vcMY2GZJYTmZnMQ/D22DIiidPICmi9rEjkPUHh5pRlRJyn0ZBgfhGnZB6Ct8fyiSTcEyxgbN1f5HJPiAXwOs9XRHKBmfdEdATwwcz6vOAFPHYdXxH7LCMjU1Asn4iVknpOMcnHsL9ibSexczHgsKOmaf6nnERRcomIZMs+K5eY+RRe173tATq0lRd4yTk34FygIbyAA9glgYt5ytCHUDFtF3CxlvdCMR16neMGrkPWdd3OC27qOu7gKkBEn1Mdp/6WDTz39MkKrtEH8JYa4fD/RcCNwNB70rGN1+TxouAiAOAljN497eLgJvpJ00e23Mx8kD2QXrNYmbL2LwquEbpn7a8CXAXmrP1VgYtA7PSpDlyjf2vtrxZcBcamT/XgKhC+yHoYcBXouq7/u4l9MfP3Yuu4wqzlGoE1Ajcj8AvY+lHSUC3vMgAAAABJRU5ErkJggg=="
+                      alt="Send"
+                      className="Send-Icon"
+                    />
+                  </button>
+                  <button
+                    className="Send-Button"
+                    type="button"
+                    onClick={() => setUploadFile(!uploadFile)}
+                  >
+                    <TextFieldsIcon />
+                  </button>
+                </div>
+              </form>
+            )}
+          </>
         )}
       </div>
     </>

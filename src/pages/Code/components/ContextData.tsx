@@ -29,14 +29,14 @@ interface ContextDataProps {
 const ContextData: React.FC<ContextDataProps> = ({ data }) => {
   return (
     <div>
-      <div style={{ marginBottom: 10, marginTop: 10 }}>
-        <Accordion>
+      <div style={{ marginBottom: 10, marginTop: 10, fontSize: 11 }}>
+        <Accordion defaultExpanded>
           <AccordionSummary
             expandIcon={<ArrowDownwardIcon />}
             aria-controls="panel1-content"
             id="panel1-header"
           >
-            <Typography>Document Referance</Typography>
+            <h2>Document Referance</h2>
           </AccordionSummary>
           <AccordionDetails>
             <div>
@@ -74,68 +74,79 @@ const ContextData: React.FC<ContextDataProps> = ({ data }) => {
                 ))}
               </List>
             </div>
-            <div>
-              <h2>Context texts</h2>
-              {data.results.documents[0].map((document, index) => (
-                <div
-                  key={index}
-                  style={{
-                    border: "1px solid black",
-                    margin: "10px",
-                    padding: "10px",
-                  }}
-                >
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    sx={{ color: "text.primary", display: "inline" }}
-                  >
-                    {document}
-                  </Typography>
-                </div>
-              ))}
 
-              {data?.fine_results && (
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ArrowDownwardIcon />}
+                aria-controls="panel1-content"
+                id="panel1-header"
+              >
+                Context texts
+              </AccordionSummary>
+              <AccordionDetails>
                 <>
-                  <h2>Finetune texts</h2>
-                  <div
-                    style={{
-                      border: "1px solid black",
-                      margin: "10px",
-                      padding: "10px",
-                    }}
-                  >
-                    <Typography
-                      component="span"
-                      variant="body2"
-                      sx={{ color: "text.secondary", display: "inline" }}
+                  {data.results.documents[0].map((document, index) => (
+                    <div
+                      key={index}
+                      style={{
+                        border: "1px solid black",
+                        margin: "10px",
+                        padding: "10px",
+                      }}
                     >
-                      {data?.fine_results}
-                    </Typography>
-                  </div>
+                      <Typography
+                        component="span"
+                        variant="body2"
+                        sx={{ color: "text.primary", display: "inline" }}
+                      >
+                        {document}
+                      </Typography>
+                    </div>
+                  ))}
+
+                  {data?.fine_results && (
+                    <>
+                      <h2>Finetune texts</h2>
+                      <div
+                        style={{
+                          border: "1px solid black",
+                          margin: "10px",
+                          padding: "10px",
+                        }}
+                      >
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ color: "text.secondary", display: "inline" }}
+                        >
+                          {data?.fine_results}
+                        </Typography>
+                      </div>
+                    </>
+                  )}
+                  {data?.gpt_results && (
+                    <>
+                      <h2>Finetune texts with LLM</h2>
+                      <div
+                        style={{
+                          border: "1px solid black",
+                          margin: "10px",
+                          padding: "10px",
+                        }}
+                      >
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{ color: "text.secondary", display: "inline" }}
+                        >
+                          {data?.gpt_results}
+                        </Typography>
+                      </div>
+                    </>
+                  )}
                 </>
-              )}
-              {data?.gpt_results && (
-                <>
-                  <h2>Finetune texts with LLM</h2>
-                  <div
-                    style={{
-                      border: "1px solid black",
-                      margin: "10px",
-                      padding: "10px",
-                    }}
-                  >
-                    <Typography
-                      component="span"
-                      variant="body2"
-                      sx={{ color: "text.secondary", display: "inline" }}
-                    >
-                      {data?.gpt_results}
-                    </Typography>
-                  </div>
-                </>
-              )}
-            </div>
+              </AccordionDetails>
+            </Accordion>
           </AccordionDetails>
         </Accordion>
       </div>

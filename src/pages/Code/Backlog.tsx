@@ -27,6 +27,7 @@ const Backlog: React.FC = () => {
     localStorage.removeItem("testdata");
     localStorage.removeItem("code");
     localStorage.removeItem("contextData");
+    localStorage.removeItem("userQuery");
 
     window.location.href = "#/story";
   };
@@ -37,6 +38,7 @@ const Backlog: React.FC = () => {
     localStorage.removeItem("testdata");
     localStorage.removeItem("code");
     localStorage.removeItem("contextData");
+    localStorage.removeItem("userQuery");
     window.location.href = `#/backlog/story?task=${id}`;
   };
 
