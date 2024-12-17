@@ -94,11 +94,6 @@ const Chat: React.FC = () => {
         Do not answer if you not find the same on the context provided
         `);
 
-    console.log(
-      "userStorydata=================>",
-      userStorydata?.replace("```html", "")
-    );
-
     return userStorydata?.replace("```html", "") as string;
   };
 
