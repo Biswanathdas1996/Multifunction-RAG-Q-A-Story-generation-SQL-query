@@ -7,10 +7,6 @@ import matplotlib.pyplot as plt
 import networkx as nx
 
 
-
-
-
-
 def create_connection(DB_CONFIG):
     try:
         connection = psycopg2.connect(**DB_CONFIG)
@@ -68,8 +64,6 @@ def get_erd_as_json(connection):
         print(f"The error '{e}' occurred")
         return None
 
-
-
 def save_erd_as_png(input_data, filename="sql/erd.png"):
     G = nx.DiGraph()
 
@@ -88,10 +82,6 @@ def save_erd_as_png(input_data, filename="sql/erd.png"):
     plt.savefig(filename)
     plt.close()
 
-
-
-
-
 def generate_erd_from(DB_CONFIG):
     connection = create_connection(DB_CONFIG)
     if connection:
@@ -101,3 +91,24 @@ def generate_erd_from(DB_CONFIG):
         connection.close()
         print(erd_json)
         return erd_json
+    
+
+def execute_sql_query(DB_CONFIG, query):
+    connection = create_connection(DB_CONFIG)
+    if connection:
+        try:
+            cursor = connection.cursor()
+            cursor.execute(query)
+            connection.commit()
+            result = cursor.fetchall()
+            return result
+        except Exception as e:
+            print(f"The error '{e}' occurred")
+            return None
+        finally:
+            cursor.close()
+            connection.close()
+    else:
+        return None
+
+

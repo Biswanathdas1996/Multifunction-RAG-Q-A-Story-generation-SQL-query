@@ -8,7 +8,7 @@ from vector_db.vector_db import delete_collection, upload_files, list_collection
 from vector_db.fine_chunking import fine_chunking
 import os
 from helper.gpt import extract_image
-from sql.db import generate_erd_from
+from sql.db import generate_erd_from, execute_sql_query
 
 if __name__ == "__main__":
     
@@ -79,6 +79,14 @@ if __name__ == "__main__":
             query = nlq(user_question)
             print("SQL Query:", query  )
             result = execute_query(query)
+            # DB_CONFIG = {
+            #     'dbname': 'postgres',
+            #     'user': 'rittikbasu',
+            #     'password': 'Postgres_007',
+            #     'host': 'testpgprac.postgres.database.azure.com',
+            #     'port': '5432'
+            # }
+            # result = execute_sql_query(DB_CONFIG, query)
 
             result_json = convert_to_json(result)
 
@@ -135,7 +143,15 @@ if __name__ == "__main__":
         try:
             print("User Question:", user_sql_query)
             
+            DB_CONFIG = {
+                'dbname': 'postgres',
+                'user': 'rittikbasu',
+                'password': 'Postgres_007',
+                'host': 'testpgprac.postgres.database.azure.com',
+                'port': '5432'
+            }
             result = execute_query(user_sql_query)
+            # result = execute_sql_query(DB_CONFIG, user_sql_query)
 
             result_json = convert_to_json(result)
 

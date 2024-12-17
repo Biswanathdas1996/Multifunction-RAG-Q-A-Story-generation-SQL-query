@@ -3,7 +3,7 @@ import TextField from "@mui/material/TextField";
 import Card from "@mui/material/Card";
 import { GENERATE_ERD_FROM_DB, GET_ERD_IMG } from "../config";
 import Button from "@mui/material/Button";
-
+import BRD from "../components/BRD";
 import ImageListItem from "@mui/material/ImageListItem";
 import ReactJson from "react-json-view";
 import Tabs from "@mui/material/Tabs";
@@ -239,16 +239,19 @@ const DBConfig: React.FC = () => {
             </Card>
           )}
           {value === "two" && (
-            <ImageListItem key={img}>
-              <img
-                srcSet={`${img}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                src={img}
-                alt={"ERD"}
-                loading="lazy"
-                height={"50vh"}
-                width={"90vw"}
-              />
-            </ImageListItem>
+            <>
+              <ImageListItem key={img}>
+                <img
+                  srcSet={`${img}?w=248&fit=crop&auto=format&dpr=2 2x`}
+                  src={img}
+                  alt={"ERD"}
+                  loading="lazy"
+                  height={"50vh"}
+                  width={"90vw"}
+                />
+              </ImageListItem>
+              {/* {dbJson && <BRD input={dbJson} />} */}
+            </>
           )}
           {value === "three" && dbJson && (
             <ReactJson src={dbJson} theme="monokai" />
