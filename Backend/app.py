@@ -156,10 +156,13 @@ if __name__ == "__main__":
     def direct_gpt_call():
         data = request.json
         user_question = data.get('question')
+        token_limit = data.get('token_limit')
         if not user_question:
             return jsonify({"error": "No question provided"}), 400
         try:
-            result_json = call_gpt("You are an expert to generate user story requiremets", user_question, 1000)
+            if not token_limit:
+                token_limit = 1000
+            result_json = call_gpt("You are a polite, helping inteligent agent", user_question, token_limit)
             return result_json
         except Exception as e:
             return jsonify({"error": str(e)}), 500
@@ -168,7 +171,7 @@ if __name__ == "__main__":
 # ------------------------------------file upload --------------------------------------------
 
 # File upload endpoint
-@app.route('/upload', methods=['POST'])
+@app.route('/upload-collection-doc', methods=['POST'])
 def upload_files_data():
     if 'files' not in request.files:
         return "No files provided", 400
@@ -239,6 +242,23 @@ def extract_img_api():
         return jsonify({"details": img_details}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+
+# @app.route('/upload-csv-for-qna', methods=['POST'])
+# def upload_files_data():
+#     if 'files' not in request.files:
+#         return "No files provided", 400
+#     collection_name = request.form.get('collection_name')
+#     files = request.files.getlist('files')
+#     try:
+#         for file in files:
+#             file_path = os.path.join('data', file.filename)
+#             file.save(file_path)
+#         return jsonify({"message": f"{len(files)} files uploaded successfully."}), 200
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
+
 
 if __name__ == "__main__":
         app.run(debug=True)

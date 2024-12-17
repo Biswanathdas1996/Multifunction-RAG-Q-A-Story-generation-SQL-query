@@ -13,8 +13,9 @@ import LibraryAddIcon from "@mui/icons-material/LibraryAdd";
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "../components/Bredcumbs";
 import Link from "@mui/material/Link";
-
+import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import { useLocation } from "react-router-dom";
+import VoiceChatIcon from "@mui/icons-material/VoiceChat";
 
 const iconStyle = {
   //  color: "#d04a02",
@@ -27,6 +28,16 @@ const routes = [
     path: "/home",
     name: "Home",
     icon: () => <HomeIcon style={iconStyle} />,
+  },
+  {
+    path: "/sql-chat",
+    name: "Q&A (Stracture)",
+    icon: () => <SpeakerNotesIcon style={iconStyle} />,
+  },
+  {
+    path: "/data-chat",
+    name: "Q&A (Un-Stracture)",
+    icon: () => <VoiceChatIcon style={iconStyle} />,
   },
   {
     path: "/query",
@@ -46,7 +57,7 @@ const routes = [
 
   {
     path: "/upload",
-    name: "Upload Document",
+    name: "Knowledge Base",
     icon: () => <UploadFileIcon style={iconStyle} />,
   },
   {

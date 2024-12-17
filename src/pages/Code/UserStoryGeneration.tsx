@@ -22,8 +22,8 @@ import CreateUserStory from "./components/CreateUserStory";
 import CreateTestCases from "./components/CreateTestCases";
 import CreateTestData from "./components/CreateTestData";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
-import AutoCompleteInput from "../../components/AutoCompleteInput";
-import { useFetchCollection } from "../../hook/useFetchCollection";
+import AutoCompleteInput from "../../components/SelectCollection";
+
 import ContextData from "./components/ContextData";
 import BoldText from "./components/BoldText";
 import ViewStory from "../../layout/ViewStory";
@@ -51,7 +51,7 @@ const Chat: React.FC = () => {
     React.useState<any>(null);
   const [code, setCode] = React.useState<string | null>(null);
   const { triggerAlert } = useAlert();
-  const { collections, error } = useFetchCollection();
+
   const [codeLang, setCodeLang] = React.useState("");
   const urlParams = new URLSearchParams(window.location.hash.split("?")[1]);
   const taskId = urlParams.get("task");
@@ -388,72 +388,67 @@ const Chat: React.FC = () => {
     <>
       <div className="chat-hldr">
         <div className="chat-scrollhldr">
-          {collections && (
+          <div
+            style={{
+              marginTop: "1rem",
+              display: "flex",
+              justifyContent: "right",
+            }}
+          >
             <div
               style={{
-                marginTop: "1rem",
                 display: "flex",
-                justifyContent: "right",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                width: "100%",
               }}
             >
+              <button
+                className="newConversationButton"
+                style={{ width: "100px", height: 20 }}
+                onClick={() => startNewProcess()}
+              >
+                Start new
+                <img
+                  src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
+                  alt="Clear Chat"
+                />
+              </button>
+              <p style={{ fontSize: 10, marginTop: 0 }}>
+                * Old data will be cleared on starting new
+              </p>
+
+              {taskId && (
+                <div
+                  style={{
+                    width: "100%",
+                  }}
+                >
+                  <span>
+                    Task id: <b>{taskId}</b>
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {!taskId && (
               <div
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: "flex-start",
+                  alignItems: "flex-end",
                   width: "100%",
                 }}
               >
-                <button
-                  className="newConversationButton"
-                  style={{ width: "100px", height: 20 }}
-                  onClick={() => startNewProcess()}
-                >
-                  Start new
-                  <img
-                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
-                    alt="Clear Chat"
-                  />
-                </button>
-                <p style={{ fontSize: 10, marginTop: 0 }}>
-                  * Old data will be cleared on starting new
+                <AutoCompleteInput />
+
+                <p style={{ fontSize: 10 }}>
+                  * generated data will be base on selected collection only
                 </p>
-
-                {taskId && (
-                  <div
-                    style={{
-                      width: "100%",
-                    }}
-                  >
-                    <span>
-                      Task id: <b>{taskId}</b>
-                    </span>
-                  </div>
-                )}
               </div>
+            )}
+          </div>
 
-              {!taskId && (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-end",
-                    width: "100%",
-                  }}
-                >
-                  <AutoCompleteInput
-                    value={value}
-                    setValue={setValue}
-                    collections={collections?.collections}
-                  />
-
-                  <p style={{ fontSize: 10 }}>
-                    * generated data will be base on selected collection only
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
           <WelcomeChatComp />
           <div className="chat-msg">
             <ViewStory

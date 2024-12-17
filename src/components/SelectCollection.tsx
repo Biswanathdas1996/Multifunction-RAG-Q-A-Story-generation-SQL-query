@@ -1,31 +1,32 @@
 import * as React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
+import { useFetchCollection } from "../hook/useFetchCollection";
 
 const filter = createFilterOptions<FilmOptionType>();
 
-interface AutoCompleteInputProps {
-  value: any;
-  setValue: React.Dispatch<any>;
-  collections: any;
-}
-const AutoCompleteInput: React.FC<AutoCompleteInputProps> = ({
-  value,
-  setValue,
-  collections,
-}) => {
-  const convertCollections = (collections: any): FilmOptionType[] => {
-    if (!Array.isArray(collections)) {
+const AutoCompleteInput: React.FC = () => {
+  const [collectionsData, setCollectionsData] = React.useState<any>([]);
+  const [error, setError] = React.useState<any>(null);
+  const { collections } = useFetchCollection();
+
+  React.useEffect(() => {
+    setCollectionsData(collections?.collections);
+  }, [collections]);
+
+  const [value, setValue] = React.useState<any>(null);
+  const convertCollections = (collectionsData: any): FilmOptionType[] => {
+    if (!Array.isArray(collectionsData)) {
       return [];
     }
-    return collections.map((collection) => {
+    return collectionsData.map((collection) => {
       return {
         title: collection,
       };
     });
   };
 
-  const result_data = convertCollections(collections);
+  const result_data = convertCollections(collectionsData);
 
   React.useEffect(() => {
     if (localStorage.getItem("selected_collection")) {

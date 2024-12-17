@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 
 // import Home from "./pages/Home";
 import Chat from "./pages/Chat";
+import ChatWithUnstructure from "./pages/ChatWithUnstructure";
 import Queries from "./pages/Queries";
 import Layout from "./layout/index";
 import SimpleAlert from "./components/Alert";
@@ -18,7 +19,9 @@ function App() {
       <SimpleAlert />
       <Routes>
         {/* <Route path="/" element={<Home />} /> */}
-        <Route path="/home" element={<Chat />} />
+        <Route path="/" element={<></>} />
+        <Route path="/sql-chat" element={<Chat />} />
+        <Route path="/data-chat" element={<ChatWithUnstructure />} />
         <Route path="/query" element={<Queries />} />
         <Route path="/story" element={<UserStoryGeneration />} />
         <Route path="/backlog/story" element={<UserStoryGeneration />} />

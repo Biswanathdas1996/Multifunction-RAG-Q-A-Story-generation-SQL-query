@@ -28,132 +28,122 @@ interface ContextDataProps {
 
 const ContextData: React.FC<ContextDataProps> = ({ data }) => {
   return (
-    <div>
-      <div style={{ marginBottom: 10, marginTop: 10, fontSize: 11 }}>
-        <Accordion defaultExpanded>
+    <div style={{ margin: "5rem", marginTop: 0 }}>
+      <div>
+        <div>
+          <h2>Document Referance</h2>
+          <List
+            sx={{
+              width: "100%",
+              maxWidth: 360,
+              bgcolor: "background.paper",
+            }}
+          >
+            {data?.results?.metadatas[0].map((metadata, index) => (
+              <div key={index}>
+                <ListItem alignItems="flex-start">
+                  <ListItemAvatar>
+                    <DescriptionIcon style={{ fontSize: "1.5rem" }} />
+                  </ListItemAvatar>
+                  <ListItemText
+                    sx={{
+                      fontSize: 10,
+                    }}
+                    primary={metadata.filename}
+                    secondary={
+                      <React.Fragment>
+                        <Typography
+                          component="span"
+                          variant="body2"
+                          sx={{
+                            color: "text.primary",
+                            display: "inline",
+                            fontSize: 10,
+                          }}
+                        >
+                          Page no. {metadata.page_no}
+                        </Typography>
+                        {` — matching distance of  ${data.results.distances[0][index]}`}
+                      </React.Fragment>
+                    }
+                  />
+                </ListItem>
+                <Divider variant="inset" component="li" />
+              </div>
+            ))}
+          </List>
+        </div>
+
+        <Accordion>
           <AccordionSummary
             expandIcon={<ArrowDownwardIcon />}
             aria-controls="panel1-content"
             id="panel1-header"
           >
-            <h2>Document Referance</h2>
+            Context texts
           </AccordionSummary>
           <AccordionDetails>
-            <div>
-              <List
-                sx={{
-                  width: "100%",
-                  maxWidth: 360,
-                  bgcolor: "background.paper",
-                }}
-              >
-                {data?.results?.metadatas[0].map((metadata, index) => (
-                  <div key={index}>
-                    <ListItem alignItems="flex-start">
-                      <ListItemAvatar>
-                        <DescriptionIcon style={{ fontSize: "1.5rem" }} />
-                      </ListItemAvatar>
-                      <ListItemText
-                        sx={{
-                          fontSize: 10,
-                        }}
-                        primary={metadata.filename}
-                        secondary={
-                          <React.Fragment>
-                            <Typography
-                              component="span"
-                              variant="body2"
-                              sx={{
-                                color: "text.primary",
-                                display: "inline",
-                                fontSize: 10,
-                              }}
-                            >
-                              Page no. {metadata.page_no}
-                            </Typography>
-                            {` — matching distance of  ${data.results.distances[0][index]}`}
-                          </React.Fragment>
-                        }
-                      />
-                    </ListItem>
-                    <Divider variant="inset" component="li" />
-                  </div>
-                ))}
-              </List>
-            </div>
+            <>
+              {data.results.documents[0].map((document, index) => (
+                <div
+                  key={index}
+                  style={{
+                    border: "1px solid black",
+                    margin: "10px",
+                    padding: "10px",
+                  }}
+                >
+                  <Typography
+                    component="span"
+                    variant="body2"
+                    sx={{ color: "text.primary", display: "inline" }}
+                  >
+                    {document}
+                  </Typography>
+                </div>
+              ))}
 
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ArrowDownwardIcon />}
-                aria-controls="panel1-content"
-                id="panel1-header"
-              >
-                Context texts
-              </AccordionSummary>
-              <AccordionDetails>
+              {data?.fine_results && (
                 <>
-                  {data.results.documents[0].map((document, index) => (
-                    <div
-                      key={index}
-                      style={{
-                        border: "1px solid black",
-                        margin: "10px",
-                        padding: "10px",
-                      }}
+                  <h2>Finetune texts</h2>
+                  <div
+                    style={{
+                      border: "1px solid black",
+                      margin: "10px",
+                      padding: "10px",
+                    }}
+                  >
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      sx={{ color: "text.secondary", display: "inline" }}
                     >
-                      <Typography
-                        component="span"
-                        variant="body2"
-                        sx={{ color: "text.primary", display: "inline" }}
-                      >
-                        {document}
-                      </Typography>
-                    </div>
-                  ))}
-
-                  {data?.fine_results && (
-                    <>
-                      <h2>Finetune texts</h2>
-                      <div
-                        style={{
-                          border: "1px solid black",
-                          margin: "10px",
-                          padding: "10px",
-                        }}
-                      >
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          sx={{ color: "text.secondary", display: "inline" }}
-                        >
-                          {data?.fine_results}
-                        </Typography>
-                      </div>
-                    </>
-                  )}
-                  {data?.gpt_results && (
-                    <>
-                      <h2>Finetune texts with LLM</h2>
-                      <div
-                        style={{
-                          border: "1px solid black",
-                          margin: "10px",
-                          padding: "10px",
-                        }}
-                      >
-                        <Typography
-                          component="span"
-                          variant="body2"
-                          sx={{ color: "text.secondary", display: "inline" }}
-                        >
-                          {data?.gpt_results}
-                        </Typography>
-                      </div>
-                    </>
-                  )}
+                      {data?.fine_results}
+                    </Typography>
+                  </div>
                 </>
-              </AccordionDetails>
-            </Accordion>
+              )}
+              {data?.gpt_results && (
+                <>
+                  <h2>Finetune texts with LLM</h2>
+                  <div
+                    style={{
+                      border: "1px solid black",
+                      margin: "10px",
+                      padding: "10px",
+                    }}
+                  >
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      sx={{ color: "text.secondary", display: "inline" }}
+                    >
+                      {data?.gpt_results}
+                    </Typography>
+                  </div>
+                </>
+              )}
+            </>
           </AccordionDetails>
         </Accordion>
       </div>
