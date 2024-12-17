@@ -7,8 +7,7 @@ from flask_cors import CORS
 from vector_db.vector_db import delete_collection, upload_files, list_collections, search_data
 from vector_db.fine_chunking import fine_chunking
 import os
-
-from gimini.llm import extract_img
+from helper.gpt import extract_image
 
 
 if __name__ == "__main__":
@@ -18,9 +17,16 @@ if __name__ == "__main__":
     CORS(app)
 
     app.config['UPLOAD_FOLDER'] = 'vector_db/uploads'
-    app.config['IMG_UPLOAD_FOLDER'] = 'gimini/uploads'
+    app.config['IMG_UPLOAD_FOLDER'] = 'asset/uploads'
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     os.makedirs(app.config['IMG_UPLOAD_FOLDER'], exist_ok=True)
+    @app.before_request
+    def before_request():
+        custom_header = request.headers.get('X-Ai-Model')
+        if custom_header:
+          
+            os.environ["X-Ai-Model"] = custom_header
+            print(f"X-Ai-Model: {custom_header}")
 
     @app.route('/query-mock', methods=['POST'])
     def query_mock():
@@ -229,7 +235,7 @@ def extract_img_api():
     file_path = os.path.join(app.config['IMG_UPLOAD_FOLDER'], file.filename)
     file.save(file_path)
     try:
-        img_details = extract_img(file_path)
+        img_details = extract_image(file_path)
         return jsonify({"details": img_details}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500

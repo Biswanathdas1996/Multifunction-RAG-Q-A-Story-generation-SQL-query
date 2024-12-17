@@ -4,11 +4,12 @@ import { Button, TextField } from "@mui/material";
 import AutoCompleteInput from "../components/AutoCompleteInput";
 import ListView from "../components/ListView";
 import { useFetchCollection } from "../hook/useFetchCollection";
+import { useFetch } from "../hook/useFetch";
 
 const Upload: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [value, setValue] = React.useState<any>(null);
-
+  const fetchData = useFetch();
   const { collections, loading, error } = useFetchCollection();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,7 +34,7 @@ const Upload: React.FC = () => {
       redirect: "follow" as RequestRedirect,
     };
 
-    fetch(UPLOAD_DOC, requestOptions)
+    fetchData(UPLOAD_DOC, requestOptions)
       .then((response) => response.json())
       .then((result) => console.log(result))
       .catch((error) => console.error(error));

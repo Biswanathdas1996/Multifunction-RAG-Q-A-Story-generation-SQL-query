@@ -13,6 +13,7 @@ import ChartSwitch from "./ChartSwitch";
 import Loader from "./Loader";
 import { Button } from "@mui/material";
 import html2canvas from "html2canvas";
+import { useFetch } from "../hook/useFetch";
 
 interface HomeProps {
   data: QueryData;
@@ -90,7 +91,7 @@ const Home: React.FC<HomeProps> = ({ data, chatId }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const chatHistory = useSelector((state: RootState) => state.chat.value);
-
+  const fetchData = useFetch();
   const chatData: any = chatHistory.find((chat) => chat.id === chatId);
 
   const allData = chatData?.message?.result;
@@ -105,7 +106,8 @@ const Home: React.FC<HomeProps> = ({ data, chatId }) => {
 
   const fetchAnaliticsData = (requestOptions: RequestOptions): void => {
     setLoading(true);
-    fetch(ANALITICS, requestOptions)
+
+    fetchData(ANALITICS, requestOptions)
       .then((response) => response.json())
       .then((result: AnaliticsResult) => {
         setLoading(false);

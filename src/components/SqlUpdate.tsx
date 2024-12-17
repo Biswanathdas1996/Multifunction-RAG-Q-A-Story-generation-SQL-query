@@ -3,6 +3,7 @@ import { EXICUTE_QUERY } from "../config";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../redux/store";
 import { updateMessage } from "../redux/slices/chatSlices";
+import { useFetch } from "../hook/useFetch";
 
 interface SqlUpdateProps {
   query: string;
@@ -18,7 +19,7 @@ const SqlUpdate: React.FC<SqlUpdateProps> = ({
   if (!chatId) return;
 
   const dispatch = useDispatch<AppDispatch>();
-
+  const fetchData = useFetch();
   const [sqlQuery, setSqlQuery] = React.useState<string>(query);
 
   const onsubmitHandler = (e: React.FormEvent<HTMLFormElement>) => {
@@ -44,7 +45,7 @@ const SqlUpdate: React.FC<SqlUpdateProps> = ({
       redirect: "follow" as RequestRedirect,
     };
 
-    fetch(EXICUTE_QUERY, requestOptions)
+    fetchData(EXICUTE_QUERY, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         setLoadingUi(false);

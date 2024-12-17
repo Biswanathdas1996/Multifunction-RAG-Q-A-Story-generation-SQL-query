@@ -7,10 +7,10 @@ import Loader from "../components/Loader";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../redux/store";
 import { addMessage } from "../redux/slices/chatSlices";
-
+import { useFetch } from "../hook/useFetch";
 const Chat: React.FC = () => {
   const chatHistory = useSelector((state: RootState) => state.chat.value);
-
+  const fetchData = useFetch();
   const dispatch = useDispatch<AppDispatch>();
 
   const [loading, setLoading] = React.useState<boolean>(false);
@@ -44,7 +44,7 @@ const Chat: React.FC = () => {
       redirect: "follow" as RequestRedirect,
     };
 
-    fetch(QUERY, requestOptions)
+    fetchData(QUERY, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         dispatch(

@@ -6,6 +6,7 @@ import Analyse from "./Analyse";
 import SqlUpdate from "./SqlUpdate";
 import { SAVE_QUERY } from "../config";
 import { useAlert } from "../hook/useAlert";
+import { useFetch } from "../hook/useFetch";
 
 interface LlmReplyProps {
   loading: boolean;
@@ -20,7 +21,7 @@ interface LlmReplyProps {
 
 const LlmReply: React.FC<LlmReplyProps> = ({ chat, userQuestion }) => {
   const { message, time, id } = chat;
-
+  const fetchData = useFetch();
   const [loadingUi, setLoadingUi] = React.useState<boolean>(false);
   const [showAnaliticsSection, setShowAnaliticsSection] =
     React.useState<boolean>(false);
@@ -51,7 +52,7 @@ const LlmReply: React.FC<LlmReplyProps> = ({ chat, userQuestion }) => {
       redirect: "follow" as RequestRedirect,
     };
 
-    fetch(SAVE_QUERY, requestOptions)
+    fetchData(SAVE_QUERY, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result);

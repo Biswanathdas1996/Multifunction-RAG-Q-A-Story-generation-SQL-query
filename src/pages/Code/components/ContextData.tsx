@@ -51,16 +51,23 @@ const ContextData: React.FC<ContextDataProps> = ({ data }) => {
                   <div key={index}>
                     <ListItem alignItems="flex-start">
                       <ListItemAvatar>
-                        <DescriptionIcon style={{ fontSize: "2.5rem" }} />
+                        <DescriptionIcon style={{ fontSize: "1.5rem" }} />
                       </ListItemAvatar>
                       <ListItemText
+                        sx={{
+                          fontSize: 10,
+                        }}
                         primary={metadata.filename}
                         secondary={
                           <React.Fragment>
                             <Typography
                               component="span"
                               variant="body2"
-                              sx={{ color: "text.primary", display: "inline" }}
+                              sx={{
+                                color: "text.primary",
+                                display: "inline",
+                                fontSize: 10,
+                              }}
                             >
                               Page no. {metadata.page_no}
                             </Typography>

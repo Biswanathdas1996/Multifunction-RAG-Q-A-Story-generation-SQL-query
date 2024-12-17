@@ -9,6 +9,10 @@ import { useState } from "react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import Card from "@mui/material/Card";
 // import Bredcumbs from "../components/Bredcumbs";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 
 interface Field {
   id: number;
@@ -91,6 +95,21 @@ export default function Config() {
   );
   const [instructionForCode, setInstructionForCode] = useState<Field[]>([]);
 
+  const [model, setModel] = React.useState("gpt-4o-mini");
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setModel(event.target.value as string);
+    localStorage.setItem("model", event.target.value as string);
+    window.location.reload();
+  };
+
+  React.useEffect(() => {
+    const savedModel = localStorage.getItem("model");
+    if (savedModel) {
+      setModel(savedModel);
+    }
+  }, []);
+
   React.useEffect(() => {
     const savedConfig = localStorage.getItem("config");
     if (savedConfig) {
@@ -131,8 +150,35 @@ export default function Config() {
   ]);
   return (
     <div>
-      <h2>Configaration</h2>
+      <h2>Configuration</h2>
       <Box sx={{ flexGrow: 1 }}>
+        <Grid container spacing={2}>
+          <Grid size={12}>
+            <>
+              <h4>Choose a AI model</h4>
+              <Box sx={{ minWidth: 120 }}>
+                <FormControl fullWidth>
+                  <InputLabel id="demo-simple-select-label">
+                    Select Model
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={model}
+                    label="Age"
+                    onChange={handleChange}
+                  >
+                    <MenuItem value={"gpt-4"}>gpt-4</MenuItem>
+                    <MenuItem value={"gpt-4o"}>gpt-4o</MenuItem>
+                    <MenuItem value={"gpt-4o-mini"}>gpt-4o-mini</MenuItem>
+                    <MenuItem value={"gpt-4-turbo"}>GPT-4-turbo</MenuItem>
+                    <MenuItem value={"gpt-3.5-turbo"}>GPT-3.5-turbo</MenuItem>
+                  </Select>
+                </FormControl>
+              </Box>
+            </>
+          </Grid>
+        </Grid>
         <Grid container spacing={2}>
           <Grid size={6}>
             <>

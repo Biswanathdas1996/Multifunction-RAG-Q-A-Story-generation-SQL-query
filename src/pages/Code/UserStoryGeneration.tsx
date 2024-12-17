@@ -27,8 +27,11 @@ import { useFetchCollection } from "../../hook/useFetchCollection";
 import ContextData from "./components/ContextData";
 import BoldText from "./components/BoldText";
 import ViewStory from "../../layout/ViewStory";
+import { useFetch } from "../../hook/useFetch";
 
 const Chat: React.FC = () => {
+  const fetchData = useFetch();
+
   const [loading, setLoading] = React.useState(false);
 
   const [imageUploadLoading, setImageUploadLoading] = React.useState(false);
@@ -89,7 +92,7 @@ const Chat: React.FC = () => {
       redirect: "follow" as RequestRedirect,
     };
 
-    return fetch(SEARCH, requestOptions)
+    return fetchData(SEARCH, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result);
@@ -149,7 +152,7 @@ const Chat: React.FC = () => {
 
   const callGpt = async (query: string): Promise<string | null> => {
     setLoading(true);
-    const response = await fetch(CALL_GPT, {
+    const response = await fetchData(CALL_GPT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -188,7 +191,7 @@ const Chat: React.FC = () => {
       redirect: "follow" as RequestRedirect,
     };
 
-    fetch(EXTRACT_IMAGE_TO_TEXT, requestOptions)
+    fetchData(EXTRACT_IMAGE_TO_TEXT, requestOptions)
       .then((response) => response.json())
       .then((result) => {
         console.log(result);

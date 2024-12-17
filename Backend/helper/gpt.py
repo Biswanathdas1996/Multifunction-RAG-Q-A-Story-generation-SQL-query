@@ -1,6 +1,11 @@
 import openai # type: ignore
 import os
 from secretes.openai_secrets import OPENAI_API_KEY
+from PIL import Image # type: ignore
+import base64
+
+from io import BytesIO
+
 
 try:
     os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
@@ -16,7 +21,7 @@ def call_gpt(config, prompt, max_tokens=50):
     try:
         response = openai.ChatCompletion.create(
             # model="gpt-4",
-            model="gpt-4o",
+            model=os.environ["X-Ai-Model"],
             messages=[
                 {"role": "system", "content": config},
                 {"role": "user", "content": prompt}
@@ -29,3 +34,24 @@ def call_gpt(config, prompt, max_tokens=50):
         return result
     except Exception as e:
         return f"An error occurred: {e}"
+
+
+def extract_image(file_path):
+    # Open the image file
+    img = Image.open(file_path)
+    
+    # Convert the image to base64
+    buffered = BytesIO()
+    img.save(buffered, format="PNG")
+    img_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+    
+    # Create the request payload
+    content = [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{img_base64}"
+                    }
+                }
+            ]
+    return call_gpt("You are good image reader", content, max_tokens=2048)
