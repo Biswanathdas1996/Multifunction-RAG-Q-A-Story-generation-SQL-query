@@ -25,6 +25,7 @@ const BoldText: React.FC<BoldTextProps> = ({ text }) => {
         line.startsWith("Applicable BU") ||
         line.startsWith("Proposed") ||
         line.startsWith("###") ||
+        line.startsWith("- **") ||
         line.match(/^\d+\./)
       ) {
         return `**${line}**`;
@@ -42,9 +43,13 @@ const BoldText: React.FC<BoldTextProps> = ({ text }) => {
         .map((line, index) => (
           <div key={index}>
             {line.startsWith("**") && line.endsWith("**") ? (
-              <strong style={{ fontWeight: 600 }}>{line.slice(2, -2)}</strong>
+              <strong style={{ fontWeight: 600 }}>
+                {line.slice(2, -2).replace(/\*/g, "")}
+              </strong>
             ) : (
-              <span style={{ color: "#333333a3" }}>{line}</span>
+              <span style={{ color: "#333333a3" }}>
+                {line.replace(/\*/g, "")}
+              </span>
             )}
             <br />
           </div>

@@ -33,6 +33,7 @@ html {
 }
 
 .content-container {
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   width: 80%;
