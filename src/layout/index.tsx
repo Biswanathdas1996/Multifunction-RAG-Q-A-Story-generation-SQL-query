@@ -16,6 +16,7 @@ import Link from "@mui/material/Link";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import { useLocation } from "react-router-dom";
 import VoiceChatIcon from "@mui/icons-material/VoiceChat";
+import DatasetLinkedIcon from "@mui/icons-material/DatasetLinked";
 
 const iconStyle = {
   //  color: "#d04a02",
@@ -33,6 +34,11 @@ const routes = [
     path: "/sql-chat",
     name: "Q&A (Stracture)",
     icon: () => <SpeakerNotesIcon style={iconStyle} />,
+  },
+  {
+    path: "/db-config",
+    name: "RDBMS Configuration",
+    icon: () => <DatasetLinkedIcon style={iconStyle} />,
   },
   {
     path: "/data-chat",

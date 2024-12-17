@@ -1,14 +1,14 @@
 from main.nlq import nlq
 from helper.utils import convert_string_to_json, convert_to_json, add_query_to_json
 from sql.index import  execute_query
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from gpt.analiticts import getAnalitics, call_gpt
 from flask_cors import CORS
 from vector_db.vector_db import delete_collection, upload_files, list_collections, search_data
 from vector_db.fine_chunking import fine_chunking
 import os
 from helper.gpt import extract_image
-
+from sql.db import generate_erd_from
 
 if __name__ == "__main__":
     
@@ -240,6 +240,48 @@ def extract_img_api():
     try:
         img_details = extract_image(file_path)
         return jsonify({"details": img_details}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+@app.route('/generate-erd-from-db', methods=['POST'])
+def generate_erd_from_db():
+    dbname = request.form.get('dbname')
+    user = request.form.get('user')
+    password = request.form.get('password')
+    host = request.form.get('host')
+    port = request.form.get('port')
+
+    if not all([dbname, user, password, host, port]):
+        return jsonify({"error": "Missing database configuration parameters"}), 400
+
+    DB_CONFIG = {
+        'dbname': dbname,
+        'user': user,
+        'password': password,
+        'host': host,
+        'port': port
+    }
+    # DB_CONFIG = {
+    #     'dbname': 'postgres',
+    #     'user': 'rittikbasu',
+    #     'password': 'Postgres_007',
+    #     'host': 'testpgprac.postgres.database.azure.com',
+    #     'port': '5432'
+    # }
+    json_result = generate_erd_from(DB_CONFIG)
+    try:
+        return json_result, 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+@app.route('/get-erd-image', methods=['GET'])
+def get_erd_img():
+    try:
+        erd_image_path = 'sql/erd.png'
+        return send_file(erd_image_path, mimetype='image/png')
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

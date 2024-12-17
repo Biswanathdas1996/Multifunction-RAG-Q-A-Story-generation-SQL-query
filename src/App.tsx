@@ -5,6 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import Chat from "./pages/Chat";
 import ChatWithUnstructure from "./pages/ChatWithUnstructure";
 import Queries from "./pages/Queries";
+import DBConfig from "./pages/DBConfig";
 import Layout from "./layout/index";
 import SimpleAlert from "./components/Alert";
 // -------------user stoty use case---------------
@@ -28,6 +29,7 @@ function App() {
         <Route path="/upload" element={<Upload />} />
         <Route path="/backlog" element={<Backlog />} />
         <Route path="/config" element={<Config />} />
+        <Route path="/db-config" element={<DBConfig />} />
       </Routes>
     </Layout>
   );
