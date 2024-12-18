@@ -1,5 +1,6 @@
 import React from "react";
 import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
 import CheckIcon from "@mui/icons-material/Check";
 import { useSelector, useDispatch } from "react-redux";
 import { AppDispatch, RootState } from "../redux/store";
@@ -18,7 +19,16 @@ export default function SimpleAlert() {
   }
 
   return alertData?.visible ? (
-    <Alert icon={<CheckIcon fontSize="inherit" />} severity={alertData?.type}>
+    <Alert
+      icon={<CheckIcon fontSize="inherit" />}
+      // variant="outlined"
+      color={alertData?.type}
+      severity={alertData?.type}
+      style={{ marginTop: "2rem" }}
+    >
+      <AlertTitle>
+        {alertData?.type.charAt(0).toUpperCase() + alertData?.type.slice(1)}
+      </AlertTitle>
       {alertData.message}
     </Alert>
   ) : null;

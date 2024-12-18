@@ -181,6 +181,22 @@ const Chat: React.FC = () => {
       return;
     }
 
+    const model = localStorage.getItem("model");
+
+    if (!model) {
+      triggerAlert("Model not selected", "error");
+      return;
+    }
+
+    console.log("model", model);
+    if (model !== "gpt-4o" && model !== "gpt-4o-mini") {
+      triggerAlert(
+        `Please select gpt-4o / gpt-4o-mini for image processing `,
+        "error"
+      );
+      return;
+    }
+
     setLoading(true);
     const formdata = new FormData();
     formdata.append("file", file);

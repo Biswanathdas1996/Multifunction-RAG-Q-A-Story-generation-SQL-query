@@ -168,7 +168,7 @@ const DBConfig: React.FC = () => {
         >
           <Tab value="one" label="Connection Details" />
           <Tab value="two" label="ERD" />
-          <Tab value="three" label="CMD" />
+          <Tab value="three" label="Schema " />
         </Tabs>
       </Box>
       {!loading && (
