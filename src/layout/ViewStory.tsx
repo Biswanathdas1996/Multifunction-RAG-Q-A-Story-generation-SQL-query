@@ -11,6 +11,7 @@ interface BasicGridProps {
   referance: any;
   taskId: any;
   userQuery: any;
+  testScript: any;
 }
 
 export default function BasicGrid({
@@ -22,16 +23,17 @@ export default function BasicGrid({
   referance,
   taskId,
   userQuery,
+  testScript,
 }: BasicGridProps) {
   return (
     <Box sx={{ flexGrow: 1 }} style={{ fontSize: 11 }}>
       <Grid container spacing={2}>
         <Grid size={12}>{userQuery()}</Grid>
-        {!taskId && <Grid size={12}>{referance()}</Grid>}
-        <Grid size={taskId ? 8 : 12}>{userStory()}</Grid>
-        {taskId && <Grid size={4}>{referance()}</Grid>}
+        <Grid size={12}>{referance()}</Grid>
+        <Grid size={12}>{userStory()}</Grid>
         <Grid size={taskId ? 7 : 12}>{testCase()}</Grid>
         <Grid size={taskId ? 5 : 12}>{testData()}</Grid>
+        <Grid size={12}>{testScript()}</Grid>
         <Grid size={12}>{codeData()}</Grid>
       </Grid>
     </Box>

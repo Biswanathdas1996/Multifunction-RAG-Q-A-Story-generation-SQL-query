@@ -39,17 +39,20 @@ const Chat: React.FC = () => {
   const fetchData = useFetch();
 
   const [loading, setLoading] = React.useState(false);
+  const [finsContextLoadding, setFinsContextLoadding] = React.useState(false);
 
   const [imageUploadLoading, setImageUploadLoading] = React.useState(false);
   const [userStoryLoading, setUserStoryLoading] = React.useState(false);
   const [testCaseLoading, setTestCaseLoading] = React.useState(false);
   const [testDataLoading, setTestDataLoading] = React.useState(false);
+  const [testScriptLoading, setTestScriptLoading] = React.useState(false);
   const [codeLoading, setCodeLoading] = React.useState(false);
 
   const [userQuery, setUserQuery] = React.useState<string | null>(null);
   const [userStory, setUserStory] = React.useState<string | null>(null);
   const [testCase, setTestCase] = React.useState<string | null>(null);
   const [testData, setTestData] = React.useState<string | null>(null);
+  const [testScript, setTestScript] = React.useState<string | null>(null);
   const [file, setFile] = React.useState<File | null>(null);
   const [uploadFile, setUploadFile] = React.useState<boolean>(false);
 
@@ -59,6 +62,7 @@ const Chat: React.FC = () => {
   const { triggerAlert } = useAlert();
 
   const [codeLang, setCodeLang] = React.useState("");
+  const [testScriptLang, setTestScriptLang] = React.useState("");
   const urlParams = new URLSearchParams(window.location.hash.split("?")[1]);
   const taskId = urlParams.get("task");
   const [value, setValue] = React.useState<any>(null);
@@ -80,13 +84,14 @@ const Chat: React.FC = () => {
   };
 
   const getContext = async (query: string) => {
+    setFinsContextLoadding(true);
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
       query: query,
       collection_name: localStorage.getItem("selected_collection"),
-      no_of_results: 3,
+      no_of_results: 10,
       fine_chunking: false,
       if_gpt_summarize: false,
     });
@@ -102,9 +107,13 @@ const Chat: React.FC = () => {
       .then((response) => response.json())
       .then((result) => {
         console.log(result);
+        setFinsContextLoadding(false);
+
         return result;
       })
-      .catch((error) => error);
+      .catch((error) => {
+        setFinsContextLoadding(false);
+      });
   };
 
   const saveDataToLocalStorage = () => {
@@ -117,6 +126,7 @@ const Chat: React.FC = () => {
         testCase,
         testData,
         code,
+        testScript,
         contextData: contextDataForStory,
       },
     ];
@@ -137,6 +147,7 @@ const Chat: React.FC = () => {
             userQuery,
             testData,
             code,
+            testScript,
           };
           localStorage.setItem("backlogData", JSON.stringify(parsedData));
         }
@@ -228,8 +239,9 @@ const Chat: React.FC = () => {
   const generateUserStory = async (query: string) => {
     if (query.length === 0) return;
     setUserQuery(query);
-    setUserStoryLoading(true);
+
     const contextData = await getContext(query);
+    setUserStoryLoading(true);
     // console.log(
     //   "=========fine_results=========>",
     //   contextData?.results?.fine_results
@@ -246,7 +258,9 @@ const Chat: React.FC = () => {
     localStorage.setItem("userQuery", query as string);
     localStorage.setItem("contextData", JSON.stringify(contextData));
     setContextDataForStory(contextData);
-    const effectiveContext = JSON.stringify(contextData);
+    const effectiveContext = contextData?.results
+      .map((item: Result) => item.text)
+      .join(" ");
     // const effectiveContext = JSON.stringify(contextData?.results?.documents);
     // const effectiveContext = contextData?.results?.gpt_results;
     // const effectiveContext = contextData?.results?.fine_results;
@@ -260,6 +274,8 @@ const Chat: React.FC = () => {
        
         
         Context of the story should be: ${effectiveContext}
+
+        Do not add any point that is not related to the context
         `);
     setUserStory(userStorydata);
     userStorydata && localStorage.setItem("userStory", userStorydata);
@@ -316,6 +332,25 @@ const Chat: React.FC = () => {
     setTestDataLoading(false);
   };
 
+  const generateTestScript = async () => {
+    if (!testCase) return;
+    setTestScriptLoading(true);
+    const instructionForTestScript = getInstructions(
+      "instructionForTestScript"
+    );
+
+    const testScriptData = await callGpt(`
+      Generate sample Test script code example in ${testScriptLang} for the  user story of :  ${userStory} \n that supports the bellow test cases\n ${testCase}
+      Use ${testData} as test data
+
+      Follow the instructions: 
+      ${instructionForTestScript}
+      `);
+    setTestScript(testScriptData);
+    testScriptData && localStorage.setItem("testScript", testScriptData);
+    setTestScriptLoading(false);
+  };
+
   const generateCode = async () => {
     if (!testData) return;
     setCodeLoading(true);
@@ -336,6 +371,7 @@ const Chat: React.FC = () => {
     const savedUserStory = localStorage.getItem("userStory");
     const savedTestcase = localStorage.getItem("testcase");
     const savedTestData = localStorage.getItem("testdata");
+    const savedtestTestScript = localStorage.getItem("testScript");
     const userQueryData = localStorage.getItem("userQuery");
     const testCode = localStorage.getItem("code");
     const contextDataStore = localStorage.getItem("contextData");
@@ -344,6 +380,9 @@ const Chat: React.FC = () => {
     }
     if (savedTestcase) {
       setTestCase(savedTestcase);
+    }
+    if (savedtestTestScript) {
+      setTestScript(savedtestTestScript);
     }
     if (savedTestData) {
       setTestData(savedTestData);
@@ -371,6 +410,7 @@ const Chat: React.FC = () => {
         if (task) {
           localStorage.setItem("userStory", task.userStory);
           localStorage.setItem("testcase", task.testCase);
+          localStorage.setItem("testScript", task.testScript);
           localStorage.setItem("testdata", task.testData);
           localStorage.setItem("userQuery", task.userQuery);
           localStorage.setItem("code", task.code);
@@ -383,6 +423,7 @@ const Chat: React.FC = () => {
           setUserStory(task.userStory);
           setTestCase(task.testCase);
           setTestData(task.testData);
+          setTestScript(task.testScript);
           setCode(task.code);
           setUserQuery(task.userQuery);
           setContextDataForStory(task.contextData);
@@ -394,12 +435,14 @@ const Chat: React.FC = () => {
   const startNewProcess = () => {
     localStorage.removeItem("userStory");
     localStorage.removeItem("testcase");
+    localStorage.removeItem("testScript");
     localStorage.removeItem("testdata");
     localStorage.removeItem("code");
     localStorage.removeItem("contextData");
     localStorage.removeItem("userQuery");
     setUserStory(null);
     setTestCase(null);
+    setTestScript(null);
     setTestData(null);
     setCode(null);
     setContextDataForStory(null);
@@ -493,106 +536,123 @@ const Chat: React.FC = () => {
                   </div>
                 )
               }
-              userStory={() =>
-                userStory && (
-                  <>
-                    {!userStoryLoading ? (
-                      <CreateUserStory
-                        userStory={userStory}
-                        setUserStory={setUserStory}
-                        testCase={testCase}
-                        generateTestCases={generateTestCases}
-                      />
-                    ) : (
-                      <Loader />
-                    )}
-                  </>
-                )
-              }
-              testCase={() =>
-                testCase && (
-                  <>
-                    {!testCaseLoading ? (
-                      <CreateTestCases
-                        testCase={testCase}
-                        setTestCase={setTestCase}
-                        generateTestCases={generateTestCases}
-                        generateTestData={generateTestData}
-                      />
-                    ) : (
-                      <Loader />
-                    )}
-                  </>
-                )
-              }
-              testData={() =>
-                testData && (
-                  <>
-                    {!testDataLoading ? (
-                      <CreateTestData
-                        testData={testData}
-                        setTestData={setTestData}
-                        generateTestData={generateTestData}
-                      />
-                    ) : (
-                      <Loader />
-                    )}
-                  </>
-                )
-              }
-              codeData={() => (
+              referance={() => (
+                <>
+                  {contextDataForStory && (
+                    <ContextFromMongo
+                      data={contextDataForStory?.results as any}
+                    />
+                  )}
+                  {finsContextLoadding && (
+                    <Loader text="Fetching relevant content" />
+                  )}
+                </>
+              )}
+              userStory={() => (
+                <>
+                  {userStory && (
+                    <CreateUserStory
+                      userStory={userStory}
+                      setUserStory={setUserStory}
+                      testCase={testCase}
+                      generateTestCases={generateTestCases}
+                    />
+                  )}
+                  {userStoryLoading && <Loader text="Generatting user story" />}
+                </>
+              )}
+              testCase={() => (
+                <>
+                  {testCase && (
+                    <CreateTestCases
+                      testCase={testCase}
+                      setTestCase={setTestCase}
+                      generateTestCases={generateTestCases}
+                      generateTestData={generateTestData}
+                    />
+                  )}
+                  {testCaseLoading && <Loader text="Generatting test cases" />}
+                </>
+              )}
+              testData={() => (
                 <>
                   {testData && (
-                    <FormControl fullWidth>
-                      <div style={{ display: "flex" }}>
-                        <div style={{ marginRight: 10, padding: 7 }}>
-                          <InputLabel id="demo-simple-select-label">
-                            Select language
-                          </InputLabel>
-                          <Select
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={codeLang}
-                            label="Age"
-                            onChange={handleChange}
-                            size="small"
-                            style={{ width: "300px" }}
-                          >
-                            <MenuItem value={"React JS"}>React JS</MenuItem>
-                            <MenuItem value={"Python"}>Python</MenuItem>
-                            <MenuItem value={"HTML"}>HTML</MenuItem>
-                            <MenuItem value={"Kotlin"}>Kotlin</MenuItem>
-                            <MenuItem value={"Apex"}>
-                              Apex (Salesforce)
-                            </MenuItem>
-                          </Select>
-                        </div>
-                        <button
-                          className="newConversationButton"
-                          style={{ width: "130px" }}
-                          onClick={() => generateCode()}
-                        >
-                          Generate code
-                          <img
-                            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
-                            alt="Clear Chat"
-                          />
-                        </button>
-                      </div>
-                    </FormControl>
+                    <CreateTestData
+                      testData={testData}
+                      setTestData={setTestData}
+                      generateTestData={generateTestData}
+                    />
                   )}
-                  {code && !loading && (
+                  {testDataLoading && <Loader text="Generating test data" />}
+                </>
+              )}
+              testScript={() => (
+                <>
+                  {testData && (
                     <>
-                      <h2>Generated Code</h2>
+                      <div>
+                        <h2>Test Script</h2>
 
-                      {!codeLoading ? (
+                        <FormControl fullWidth>
+                          <div style={{ display: "flex" }}>
+                            <div style={{ marginRight: 10, padding: 7 }}>
+                              <InputLabel id="demo-simple-select-label">
+                                Select language for test scripts
+                              </InputLabel>
+                              <Select
+                                labelId="demo-simple-select-label"
+                                id="demo-simple-select"
+                                value={testScriptLang}
+                                label="Age"
+                                onChange={(event: SelectChangeEvent<string>) =>
+                                  setTestScriptLang(event.target.value)
+                                }
+                                size="small"
+                                style={{ width: "300px" }}
+                              >
+                                <MenuItem value={"Java Selenium"}>
+                                  Java Selenium
+                                </MenuItem>
+                                <MenuItem value={"Python Selenium"}>
+                                  Python Selenium
+                                </MenuItem>
+                                <MenuItem value={"Robot Framework"}>
+                                  Robot Framework
+                                </MenuItem>
+                                <MenuItem value={"Cypress"}>Cypress</MenuItem>
+                                <MenuItem value={"WebDriver IO"}>
+                                  WebDriver IO
+                                </MenuItem>
+                                <MenuItem value={"Playwright"}>
+                                  Playwright
+                                </MenuItem>
+                              </Select>
+                            </div>
+                            <button
+                              className="newConversationButton"
+                              style={{ width: "130px" }}
+                              onClick={() => generateTestScript()}
+                            >
+                              Generate test script
+                              <img
+                                src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
+                                alt="Clear Chat"
+                              />
+                            </button>
+                          </div>
+                        </FormControl>
+                      </div>
+                      <br />
+                      <br />
+                      {testScript && (
                         <AceEditor
+                          key="testScript"
                           mode="javascript"
                           theme="monokai"
-                          value={code}
+                          value={testScript}
                           onChange={(newValue) => {
-                            setCode(newValue);
-                            localStorage.setItem("code", newValue);
+                            setTestScript(newValue);
+                            localStorage.setItem("testScript", newValue);
                           }}
                           setOptions={{
                             useWorker: false,
@@ -602,46 +662,99 @@ const Chat: React.FC = () => {
                           width="100%"
                           style={{ padding: 10, borderRadius: 15 }}
                         />
-                      ) : (
-                        <Loader />
                       )}
-
-                      <br />
-
-                      <div
-                        style={{ display: "flex", justifyContent: "flex-end" }}
-                      >
-                        <button
-                          className="newConversationButton"
-                          style={{ width: "130px" }}
-                          onClick={() => saveDataToLocalStorage()}
-                        >
-                          {taskId ? "Update" : "Save"}
-                          <img
-                            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
-                            alt="Clear Chat"
-                          />
-                        </button>
-                      </div>
                     </>
+                  )}
+                  {testScriptLoading && (
+                    <Loader text="Generating test script" />
                   )}
                 </>
               )}
-              // referance={() =>
-              //   contextDataForStory && (
-              //     <ContextData data={contextDataForStory} />
-              //   )
-              // }
-              referance={() =>
-                contextDataForStory && (
-                  <ContextFromMongo
-                    data={contextDataForStory?.results as any}
-                  />
-                )
-              }
-            />
+              codeData={() => (
+                <>
+                  {testScript && (
+                    <>
+                      <h2>Generated Code</h2>
+                      <FormControl fullWidth>
+                        <div style={{ display: "flex" }}>
+                          <div style={{ marginRight: 10, padding: 7 }}>
+                            <InputLabel id="demo-simple-select-label">
+                              Select language
+                            </InputLabel>
+                            <Select
+                              labelId="demo-simple-select-label"
+                              id="demo-simple-select"
+                              value={codeLang}
+                              label="Age"
+                              onChange={handleChange}
+                              size="small"
+                              style={{ width: "300px" }}
+                            >
+                              <MenuItem value={"React JS"}>React JS</MenuItem>
+                              <MenuItem value={"Python"}>Python</MenuItem>
+                              <MenuItem value={"HTML"}>HTML</MenuItem>
+                              <MenuItem value={"Kotlin"}>Kotlin</MenuItem>
+                              <MenuItem value={"Apex"}>
+                                Apex (Salesforce)
+                              </MenuItem>
+                            </Select>
+                          </div>
+                          <button
+                            className="newConversationButton"
+                            style={{ width: "130px" }}
+                            onClick={() => generateCode()}
+                          >
+                            Generate code
+                            <img
+                              src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
+                              alt="Clear Chat"
+                            />
+                          </button>
+                        </div>
+                      </FormControl>
+                    </>
+                  )}
+                  <br />
+                  <br />
+                  {code && (
+                    <AceEditor
+                      mode="javascript"
+                      theme="monokai"
+                      value={code}
+                      onChange={(newValue) => {
+                        setCode(newValue);
+                        localStorage.setItem("code", newValue);
+                      }}
+                      setOptions={{
+                        useWorker: false,
+                      }}
+                      editorProps={{ $blockScrolling: true }}
+                      //   height="400px"
+                      width="100%"
+                      style={{ padding: 10, borderRadius: 15 }}
+                    />
+                  )}
 
-            {loading && <Loader />}
+                  {codeLoading && <Loader text="Generating code" />}
+                </>
+              )}
+            />
+            {code && (
+              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                <button
+                  className="newConversationButton"
+                  style={{ width: "130px" }}
+                  onClick={() => saveDataToLocalStorage()}
+                >
+                  {taskId ? "Update" : "Save"}
+                  <img
+                    src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACIAAAAiCAYAAAA6RwvCAAAAAXNSR0IArs4c6QAAAqBJREFUWAm1WLuRAjEMpQRKuAYogIyIAiiAuRgSIghhhgIoAGaOkOwIyKEDLoQcYlk0sHdvx1qMd621ObgZj9a29PQsyR+u0Uj4I6ImEY2Y+csYc2RmYubMNsKYMeabiD6J6CMBOk6ViDrGmL3jVJyr0pLqxHlRtLCqZwj4hC2h5yJkU+CGXl2977yiT8BU1l2e+gOZVgD9l4jYT8seK0beTCKOjE2HKKvyfD5n4/H4oV2vV9XGjXIwTShMbzuqoIfDIWu1Wlm3283a7Xb+jTHXWc03aqZcwKjsGsMHJ0IE0v1OwbjdbvuH6sA5kQIAXde5+52KA98FGSLaagCn0ynz2263K9IhRDabTUkPdhp2ERVbG0FlAKEWQg0khEhIp44Mro4G7gWNsRDBDsGK/YZ57BZ/HH3YgFwEkRGI1KYFYADWCFfNwSaGCC7RBjPjFg06kYhMJpPKVVdFQsZgE0nkCCLqfSJEAPhsizjoCESC0ZA52SHL5TIvTClQTUIXxGNTGkVEQCNWVixKIglbWZAma1MD4/l8nh/jAoQIDYfDkoPBYJBhTvRw9MNW+orMU6MWK4z7/X7eBGixWOR3jPRF+qmAXa/XiyFyxPZdC1BI+iuLJeJHMoTPzFsQwWM4yBp1gZXCOfKOBge4daUvEnqr1aoYhw3GMK/5wKEKIk1Nqe74hqO6BgzNR/EcwMUTUkREUIBySD0jL5eLRmTr3r7Jz4AQ8dTxh2cAGGlRSQVP0L9HQ8JinwPqcZ/gQEuFzFU/FUGobge9mIj+G4eZZy92KBFw5Uwyoco3k4kjIQxtml5ZM8DS0yHOfWkLWH3BxaTRGHMoDi3fSUrf/txIJmQJ3H8upDjVdLEq+9jeGmN+vNcd/lGDsTXSmr/MNTBv7hffBPEsHKEseQAAAABJRU5ErkJggg=="
+                    alt="Clear Chat"
+                  />
+                </button>
+              </div>
+            )}{" "}
+            {/* {loading && <Loader />} */}
           </div>
         </div>
         <br />

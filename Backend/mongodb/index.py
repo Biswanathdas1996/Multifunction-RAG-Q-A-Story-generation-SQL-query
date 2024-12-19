@@ -5,13 +5,15 @@ from pymongo import MongoClient
 import os
 from pymongo.operations import SearchIndexModel
 import time
+from flask import Flask, request, jsonify
 
 
-
-
+ 
 
 def get_collection(index_name):
-    client = MongoClient("mongodb+srv://bd1:Papun$1996@cluster0.mehhr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&readPreference=primary")
+    client = MongoClient("mongodb+srv://bd1:Papun$1996@cluster0.mehhr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&readPreference=primary",
+                          tls=True,
+    tlsAllowInvalidCertificates=True)
     collection = client["rag_db"][index_name]
     return collection
 
@@ -134,12 +136,6 @@ def get_query_results(query, index_name, no_of_results= 5):
       array_of_results.append(doc)
   return array_of_results
 
-# # Test the function with a sample query
-# context_docs = get_query_results("OTP Verification is not required for UAN Linked Mobile Number")
-# print(context_docs)
-# print("==========>")
-# context_string = " ".join([doc["text"] for doc in context_docs])
-# print(context_string)
 
 def list_indexes():
     collection = get_collection("any")
@@ -148,5 +144,69 @@ def list_indexes():
     # indexes = collection.list_indexes()
     return indexes
 
+# ------------------------------------------api ready functions--------------------------------------------
 
 
+
+def upload_files_data_mongo_api():
+    if 'files' not in request.files:
+        return "No files provided", 400
+    collection_name = request.form.get('collection_name')
+    files = request.files.getlist('files')
+    try:
+        result = upload_file_to_mongo_db(files,'mongodb/uploads',collection_name)
+      
+        return jsonify({f"message": "Data inserted successfully for {collection_name}"}), 200 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+
+def index_collextion_mongo_api():
+    collection_name = request.form.get('collection_name')
+    try:
+        result = indexing(collection_name)
+      
+        return jsonify({f"message": "{collection_name} successfully indxed "}), 200 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+
+def list_all_index_api():   
+    try:
+        result = list_indexes()
+      
+        return jsonify({f"collections": result}), 200 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+    
+
+def get_query_results_mongo_api():
+    data = request.get_json()
+    query = data.get('query')
+    no_of_results = data.get('no_of_results')
+    collection_name = data.get('collection_name')
+    try:
+        result = get_query_results(query,collection_name, no_of_results)
+
+        response_result = {"results": result}
+
+        return jsonify(response_result), 200 
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+def render_mongo_pack(app):
+    app.add_url_rule('/upload-collection-doc-mongo', 'upload_files_data_mongo', upload_files_data_mongo_api, methods=['POST'])
+    app.add_url_rule('/indexing-mongo', 'index_collextion_mongo', index_collextion_mongo_api, methods=['POST'])
+    app.add_url_rule('/list-index-mongo', 'list_all_index', list_all_index_api, methods=['GET'])
+    app.add_url_rule('/get-context-mongo', 'get_query_results_mongo', get_query_results_mongo_api, methods=['POST'])
+    return app
+    
+# if __name__ == "__main__":
+#     app = Flask(__name__)
+#     app = render_mongo_pack(app)
+#     app.run(host='0.0.0.0', port=5000)

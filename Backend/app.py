@@ -9,13 +9,17 @@ from vector_db.fine_chunking import fine_chunking
 import os
 from helper.gpt import extract_image
 from sql.db import generate_erd_from, execute_sql_query
-from mongodb.index import upload_file_to_mongo_db, indexing,  list_indexes, get_query_results
+from mongodb.index import render_mongo_pack
 
 if __name__ == "__main__":
     
     app = Flask(__name__)
-
+    # ----------------------------mongo DB--------------------------------------------
+    app = render_mongo_pack(app)
+    # --------------------------------------------------------------------------------
     CORS(app)
+ 
+    
 
     app.config['UPLOAD_FOLDER'] = 'vector_db/uploads'
     app.config['IMG_UPLOAD_FOLDER'] = 'asset/uploads'
@@ -247,64 +251,7 @@ def delete_collection():
     result = delete_collection(collection_name)
     return jsonify({"collections": result}), 200
 
-# ----------------------------mongo DB--------------------------------------------
 
-@app.route('/upload-collection-doc-mongo', methods=['POST'])
-def upload_files_data_mongo():
-    if 'files' not in request.files:
-        return "No files provided", 400
-    collection_name = request.form.get('collection_name')
-    files = request.files.getlist('files')
-    try:
-        result = upload_file_to_mongo_db(files,'mongodb/uploads',collection_name)
-      
-        return jsonify({f"message": "Data inserted successfully for {collection_name}"}), 200 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
-
-@app.route('/indexing-mongo', methods=['POST'])
-def index_collextion_mongo():
-   
-    collection_name = request.form.get('collection_name')
-    try:
-        result = indexing(collection_name)
-      
-        return jsonify({f"message": "{collection_name} successfully indxed "}), 200 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
-
-@app.route('/list-index-mongo', methods=['GET'])
-def list_all_index():   
-    try:
-        result = list_indexes()
-      
-        return jsonify({f"collections": result}), 200 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
-    
-@app.route('/get-context-mongo', methods=['POST'])
-def get_query_results_mongo():
-    data = request.get_json()
-   
-    query = data.get('query')
-    no_of_results = data.get('no_of_results')
-    collection_name = data.get('collection_name')
-    try:
-        result = get_query_results(query,collection_name, no_of_results)
-
-        response_result = {"results": result}
-
-        return jsonify(response_result), 200 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-
-
-
-# --------------------------------------------------------------------------------
 
 @app.route('/extract-img', methods=['POST'])
 def extract_img_api():

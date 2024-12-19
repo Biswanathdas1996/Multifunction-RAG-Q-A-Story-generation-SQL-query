@@ -2,9 +2,13 @@ import React from "react";
 
 interface LoaderProps {
   showIcon?: boolean;
+  text?: string;
 }
 
-const Loader: React.FC<LoaderProps> = ({ showIcon = true }) => {
+const Loader: React.FC<LoaderProps> = ({
+  showIcon = true,
+  text = "Generating",
+}) => {
   return (
     <>
       <div className="chat-msg-list msg-hldr-cb gap10px">
@@ -17,7 +21,7 @@ const Loader: React.FC<LoaderProps> = ({ showIcon = true }) => {
           </div>
         )}{" "}
         <div className="typmg">
-          <span>Generating</span>
+          <span>{text}</span>
           <div id="loading-dot"></div>
         </div>
       </div>
