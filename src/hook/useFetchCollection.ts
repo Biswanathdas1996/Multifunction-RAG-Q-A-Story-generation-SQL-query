@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { COLLECTIONS } from "../config";
+import { LIST_ALL_COLLECTION } from "../config";
 import { useFetch } from "./useFetch";
 export const useFetchCollection = () => {
   const [collections, setCollections] = useState<any>(null);
@@ -10,7 +10,7 @@ export const useFetchCollection = () => {
   useEffect(() => {
     const fetchDataFromAPI = async () => {
       try {
-        const response = await fetchData(COLLECTIONS, {
+        const response = await fetchData(LIST_ALL_COLLECTION, {
           method: "GET",
           redirect: "follow" as RequestRedirect,
         });

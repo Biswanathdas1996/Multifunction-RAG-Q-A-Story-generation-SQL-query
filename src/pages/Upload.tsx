@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { UPLOAD_DOC, COLLECTIONS } from "../config";
+import { UPLOAD_DOC, INDEXING } from "../config";
 import { Button, TextField } from "@mui/material";
 import AutoCompleteInput from "../components/SelectCollection";
 import ListView from "../components/ListView";
@@ -25,7 +25,10 @@ const Upload: React.FC = () => {
 
     const formdata = new FormData();
     formdata.append("files", file);
-    formdata.append("collection_name", value?.title);
+    formdata.append(
+      "collection_name",
+      localStorage.getItem("selected_collection") as string
+    );
 
     const requestOptions = {
       method: "POST",
@@ -35,9 +38,37 @@ const Upload: React.FC = () => {
 
     fetchData(UPLOAD_DOC, requestOptions)
       .then((response) => response.json())
+      .then((result) => {
+        console.log(result);
+        indexing_collection(
+          localStorage.getItem("selected_collection") as string
+        );
+      })
+      .catch((error) => console.error(error));
+  };
+
+  interface IndexingRequestOptions {
+    method: string;
+    body: FormData;
+    redirect: RequestRedirect;
+  }
+
+  const indexing_collection = (collection_name: string): void => {
+    const formdata = new FormData();
+    formdata.append("collection_name", collection_name);
+
+    const requestOptions: IndexingRequestOptions = {
+      method: "POST",
+      body: formdata,
+      redirect: "follow" as RequestRedirect,
+    };
+
+    fetch(INDEXING, requestOptions)
+      .then((response) => response.text())
       .then((result) => console.log(result))
       .catch((error) => console.error(error));
   };
+
   console.log(value?.title);
   return (
     <>

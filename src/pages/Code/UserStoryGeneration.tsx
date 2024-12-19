@@ -25,9 +25,15 @@ import TextFieldsIcon from "@mui/icons-material/TextFields";
 import AutoCompleteInput from "../../components/SelectCollection";
 
 import ContextData from "./components/ContextData";
+import ContextFromMongo from "./components/ContextFromMongo";
 import BoldText from "./components/BoldText";
 import ViewStory from "../../layout/ViewStory";
 import { useFetch } from "../../hook/useFetch";
+
+interface Result {
+  page_number: number;
+  text: string;
+}
 
 const Chat: React.FC = () => {
   const fetchData = useFetch();
@@ -240,7 +246,8 @@ const Chat: React.FC = () => {
     localStorage.setItem("userQuery", query as string);
     localStorage.setItem("contextData", JSON.stringify(contextData));
     setContextDataForStory(contextData);
-    const effectiveContext = JSON.stringify(contextData?.results?.documents);
+    const effectiveContext = JSON.stringify(contextData);
+    // const effectiveContext = JSON.stringify(contextData?.results?.documents);
     // const effectiveContext = contextData?.results?.gpt_results;
     // const effectiveContext = contextData?.results?.fine_results;
     const instructionForUserStories = getInstructions(
@@ -620,9 +627,16 @@ const Chat: React.FC = () => {
                   )}
                 </>
               )}
+              // referance={() =>
+              //   contextDataForStory && (
+              //     <ContextData data={contextDataForStory} />
+              //   )
+              // }
               referance={() =>
                 contextDataForStory && (
-                  <ContextData data={contextDataForStory} />
+                  <ContextFromMongo
+                    data={contextDataForStory?.results as any}
+                  />
                 )
               }
             />

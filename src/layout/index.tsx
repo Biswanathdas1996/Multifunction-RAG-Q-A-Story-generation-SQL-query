@@ -30,26 +30,13 @@ const routes = [
     name: "Home",
     icon: () => <HomeIcon style={iconStyle} />,
   },
-  {
-    path: "/sql-chat",
-    name: "Q&A (Stracture)",
-    icon: () => <SpeakerNotesIcon style={iconStyle} />,
-  },
-  {
-    path: "/db-config",
-    name: "RDBMS Configuration",
-    icon: () => <DatasetLinkedIcon style={iconStyle} />,
-  },
+
   {
     path: "/data-chat",
     name: "Q&A (Un-Stracture)",
     icon: () => <VoiceChatIcon style={iconStyle} />,
   },
-  {
-    path: "/query",
-    name: "Saved Query",
-    icon: () => <SaveAsIcon style={iconStyle} />,
-  },
+
   // {
   //   path: "/user-story",
   //   name: "Create New Story",

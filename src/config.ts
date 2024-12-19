@@ -6,13 +6,19 @@ export const QUERY = USE_MOCK ? `${BASE_URL}/query-mock` : `${BASE_URL}/query`;
 export const EXICUTE_QUERY = `${BASE_URL}/exicute-raw-query`;
 export const SAVE_QUERY = `${BASE_URL}/save-query`;
 export const CALL_GPT = `${BASE_URL}/call-gpt`;
-export const UPLOAD_DOC = `${BASE_URL}/upload-collection-doc`;
+// export const UPLOAD_DOC = `${BASE_URL}/upload-collection-doc`;
+// export const SEARCH = `${BASE_URL}/search`;
+export const SEARCH = `${BASE_URL}/get-context-mongo`;
+export const UPLOAD_DOC = `${BASE_URL}/upload-collection-doc-mongo`;
+export const INDEXING = `${BASE_URL}/indexing-mongo`;
+export const LIST_ALL_COLLECTION = `${BASE_URL}/list-index-mongo`;
+
 export const COLLECTIONS = `${BASE_URL}/collection`;
 export const EXTRACT_IMAGE_TO_TEXT = `${BASE_URL}/extract-img`;
 export const QUERY_LIST = `${BASE_URL}/query-list`;
 export const GENERATE_ERD_FROM_DB = `${BASE_URL}/generate-erd-from-db`;
 export const GET_ERD_IMG = `${BASE_URL}/get-erd-image`;
-export const SEARCH = `${BASE_URL}/search`;
+
 export const ANALITICS = USE_MOCK
   ? `${BASE_URL}/analitics-mock`
   : `${BASE_URL}/analitics`;
