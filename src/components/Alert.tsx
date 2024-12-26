@@ -24,7 +24,7 @@ export default function SimpleAlert() {
       // variant="outlined"
       color={alertData?.type}
       severity={alertData?.type}
-      style={{ marginTop: "2rem" }}
+      style={{ marginBottom: "-4rem", zIndex: 1000000, position: "relative" }}
     >
       <AlertTitle>
         {alertData?.type.charAt(0).toUpperCase() + alertData?.type.slice(1)}

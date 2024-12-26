@@ -19,6 +19,14 @@ export const QUERY_LIST = `${BASE_URL}/query-list`;
 export const GENERATE_ERD_FROM_DB = `${BASE_URL}/generate-erd-from-db`;
 export const GET_ERD_IMG = `${BASE_URL}/get-erd-image`;
 
+// ---------Mongo ---------------------------
+export const INSERT_DATA_TO_MONGO = `${BASE_URL}/insert-data`;
+export const UPDATE_DATA_TO_MONGO_BY_ID = `${BASE_URL}/update-data-by-id`;
+export const GET_ALL_DATA = `${BASE_URL}/get-all-data`;
+export const GET_DATA_BY_ID = `${BASE_URL}/get-data-by-id`;
+
+// mongo ----------------------------------
+
 export const ANALITICS = USE_MOCK
   ? `${BASE_URL}/analitics-mock`
   : `${BASE_URL}/analitics`;

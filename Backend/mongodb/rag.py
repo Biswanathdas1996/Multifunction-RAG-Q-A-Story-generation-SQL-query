@@ -6,15 +6,13 @@ import os
 from pymongo.operations import SearchIndexModel
 import time
 from flask import Flask, request, jsonify
+from mongodb.client import get_Client
 
-
- 
 
 def get_collection(index_name):
-    client = MongoClient("mongodb+srv://bd1:Papun$1996@cluster0.mehhr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&readPreference=primary",
-                          tls=True,
-    tlsAllowInvalidCertificates=True)
-    collection = client["rag_db"][index_name]
+    
+    my_client = get_Client()
+    collection = my_client["rag_db"][index_name]
     return collection
 
 # Define a function to generate embeddings
@@ -200,6 +198,7 @@ def get_query_results_mongo_api():
 
 
 def render_mongo_pack(app):
+    
     app.add_url_rule('/upload-collection-doc-mongo', 'upload_files_data_mongo', upload_files_data_mongo_api, methods=['POST'])
     app.add_url_rule('/indexing-mongo', 'index_collextion_mongo', index_collextion_mongo_api, methods=['POST'])
     app.add_url_rule('/list-index-mongo', 'list_all_index', list_all_index_api, methods=['GET'])

@@ -9,13 +9,15 @@ from vector_db.fine_chunking import fine_chunking
 import os
 from helper.gpt import extract_image
 from sql.db import generate_erd_from, execute_sql_query
-from mongodb.index import render_mongo_pack
+from mongodb.rag import render_mongo_pack
+from mongodb.data_handling import render_mongo_data_pack
 
 if __name__ == "__main__":
     
     app = Flask(__name__)
     # ----------------------------mongo DB--------------------------------------------
     app = render_mongo_pack(app)
+    app = render_mongo_data_pack(app)
     # --------------------------------------------------------------------------------
     CORS(app)
  

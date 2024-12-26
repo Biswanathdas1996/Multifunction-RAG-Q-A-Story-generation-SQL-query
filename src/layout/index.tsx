@@ -33,7 +33,7 @@ const routes = [
 
   {
     path: "/data-chat",
-    name: "Q&A (Un-Stracture)",
+    name: "Q&A (Un-Structure)",
     icon: () => <VoiceChatIcon style={iconStyle} />,
   },
 

@@ -22,6 +22,10 @@ export const useFetch = (): ((
 
     headers.append("X-Ai-Model", selectedMode || "gpt-4");
 
+    const collection = localStorage.getItem("my_default_collection");
+
+    headers.append("X-mongo-collection", collection || "my_default_collection");
+
     // Update requestOptions with the new headers
     requestOptions.headers = headers;
 

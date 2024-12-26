@@ -11,7 +11,14 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { useAlert } from "../../hook/useAlert";
 import AceEditor from "react-ace";
-import { CALL_GPT, SEARCH, EXTRACT_IMAGE_TO_TEXT } from "../../config";
+import {
+  CALL_GPT,
+  SEARCH,
+  EXTRACT_IMAGE_TO_TEXT,
+  INSERT_DATA_TO_MONGO,
+  GET_DATA_BY_ID,
+  UPDATE_DATA_TO_MONGO_BY_ID,
+} from "../../config";
 // Import a theme and language
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/worker-javascript";
@@ -116,51 +123,83 @@ const Chat: React.FC = () => {
       });
   };
 
-  const saveDataToLocalStorage = () => {
-    const data = [
-      {
-        id: new Date().getTime(),
-        sprint: "backlog",
-        userQuery,
-        userStory,
-        testCase,
-        testData,
-        code,
-        testScript,
-        contextData: contextDataForStory,
-      },
-    ];
-
-    const backlogData = localStorage.getItem("backlogData");
-
-    if (backlogData) {
-      if (taskId) {
-        const parsedData = backlogData ? JSON.parse(backlogData) : [];
-        const taskIndex = parsedData.findIndex(
-          (item: any) => item.id.toString() == taskId
-        );
-        if (taskIndex !== -1) {
-          parsedData[taskIndex] = {
-            ...parsedData[taskIndex],
+  const saveDataToLocalStorage = async () => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+    window.pageLoader(true);
+    if (taskId) {
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify({
+          data: {
+            storyid: new Date().getTime(),
+            sprint: "backlog",
+            userQuery,
             userStory,
             testCase,
-            userQuery,
             testData,
             code,
             testScript,
-          };
-          localStorage.setItem("backlogData", JSON.stringify(parsedData));
-        }
-      } else {
-        const parsedData = JSON.parse(backlogData);
-        parsedData.push(...data);
-        localStorage.setItem("backlogData", JSON.stringify(parsedData));
-      }
+            contextData: contextDataForStory,
+          },
+          id: taskId,
+        }),
+        redirect: "follow",
+      };
+      await fetchData(UPDATE_DATA_TO_MONGO_BY_ID, requestOptions)
+        .then((response) => response.json())
+        .then((data) => {
+          triggerAlert("Ticket updated Successfully !", "success");
+          window.pageLoader(false);
+          return data;
+        })
+        .catch((error) => {
+          window.pageLoader(false);
+          console.error("Error:", error);
+
+          triggerAlert(JSON.stringify(error), "error");
+          return error;
+        });
     } else {
-      localStorage.setItem("backlogData", JSON.stringify(data));
+      const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: JSON.stringify({
+          data: {
+            storyid: new Date().getTime(),
+            sprint: "backlog",
+            userQuery,
+            userStory,
+            testCase,
+            testData,
+            code,
+            testScript,
+            contextData: contextDataForStory,
+          },
+        }),
+        redirect: "follow",
+      };
+      await fetchData(INSERT_DATA_TO_MONGO, requestOptions)
+        .then((response) => response.json())
+        .then((data) => {
+          window.pageLoader(false);
+          triggerAlert(
+            "Ticket created Successfully & pushed to backlog!",
+            "success"
+          );
+          return data;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          window.pageLoader(false);
+          triggerAlert(JSON.stringify(error), "error");
+          return error;
+        });
+      window.location.href = "#/backlog";
     }
-    triggerAlert("Ticket created Successfully & pushed to backlog!", "success");
-    window.location.href = "#/backlog";
+
+    // -------------------------------------------------------------------------------------------
   };
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -184,7 +223,7 @@ const Chat: React.FC = () => {
         return data;
       })
       .catch((error) => {
-        console.error("Error:", error);
+        triggerAlert(JSON.stringify(error), "error");
         setLoading(false);
         return error;
       });
@@ -214,7 +253,7 @@ const Chat: React.FC = () => {
       return;
     }
 
-    setLoading(true);
+    setImageUploadLoading(true);
     const formdata = new FormData();
     formdata.append("file", file);
 
@@ -229,10 +268,11 @@ const Chat: React.FC = () => {
       .then((result) => {
         console.log(result);
         generateUserStory(result?.details);
+        setImageUploadLoading(false);
       })
       .catch((error) => {
         console.error(error);
-        setLoading(false);
+        setImageUploadLoading(false);
       });
   };
 
@@ -375,60 +415,83 @@ const Chat: React.FC = () => {
     const userQueryData = localStorage.getItem("userQuery");
     const testCode = localStorage.getItem("code");
     const contextDataStore = localStorage.getItem("contextData");
-    if (savedUserStory) {
-      setUserStory(savedUserStory);
-    }
-    if (savedTestcase) {
-      setTestCase(savedTestcase);
-    }
-    if (savedtestTestScript) {
-      setTestScript(savedtestTestScript);
-    }
-    if (savedTestData) {
-      setTestData(savedTestData);
-    }
-    if (testCode) {
-      setCode(testCode);
-    }
-    if (contextDataStore) {
-      setContextDataForStory(JSON.parse(contextDataStore));
-    }
-    if (userQueryData) {
-      setUserQuery(userQueryData);
+    try {
+      if (savedUserStory) {
+        setUserStory(savedUserStory);
+      }
+      if (savedTestcase) {
+        setTestCase(savedTestcase);
+      }
+      if (savedtestTestScript) {
+        setTestScript(savedtestTestScript);
+      }
+      if (savedTestData) {
+        setTestData(savedTestData);
+      }
+      if (testCode) {
+        setCode(testCode);
+      }
+      if (contextDataStore) {
+        setContextDataForStory(JSON.parse(contextDataStore));
+      }
+      if (userQueryData) {
+        setUserQuery(userQueryData);
+      }
+    } catch (error) {
+      console.error("Error loading saved data:", error);
+      triggerAlert(JSON.stringify(error), "error");
     }
   }, []);
 
   React.useEffect(() => {
     if (taskId) {
-      const backlogData = localStorage.getItem("backlogData");
-      if (backlogData) {
-        const parsedData = JSON.parse(backlogData);
-        const task = parsedData.find(
-          (item: any) => item.id.toString() == taskId
-        );
+      window.pageLoader(true);
+      const raw = JSON.stringify({
+        id: taskId,
+      });
 
-        if (task) {
-          localStorage.setItem("userStory", task.userStory);
-          localStorage.setItem("testcase", task.testCase);
-          localStorage.setItem("testScript", task.testScript);
-          localStorage.setItem("testdata", task.testData);
-          localStorage.setItem("userQuery", task.userQuery);
-          localStorage.setItem("code", task.code);
-          if (task?.contextData)
-            localStorage.setItem(
-              "contextData",
-              JSON.stringify(task?.contextData)
-            );
+      const requestOptions: RequestInit = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: raw,
+        redirect: "follow" as RequestRedirect,
+      };
 
-          setUserStory(task.userStory);
-          setTestCase(task.testCase);
-          setTestData(task.testData);
-          setTestScript(task.testScript);
-          setCode(task.code);
-          setUserQuery(task.userQuery);
-          setContextDataForStory(task.contextData);
-        }
-      }
+      fetchData(GET_DATA_BY_ID, requestOptions)
+        .then((response) => response.json())
+        .then((result) => {
+          console.log(result);
+          const task = result?.data;
+          if (task) {
+            localStorage.setItem("userStory", task.userStory);
+            localStorage.setItem("testcase", task.testCase);
+            localStorage.setItem("testScript", task.testScript);
+            localStorage.setItem("testdata", task.testData);
+            localStorage.setItem("userQuery", task.userQuery);
+            localStorage.setItem("code", task.code);
+            if (task?.contextData)
+              localStorage.setItem(
+                "contextData",
+                JSON.stringify(task?.contextData)
+              );
+
+            setUserStory(task.userStory);
+            setTestCase(task.testCase);
+            setTestData(task.testData);
+            setTestScript(task.testScript);
+            setCode(task.code);
+            setUserQuery(task.userQuery);
+            setContextDataForStory(task.contextData);
+          }
+          window.pageLoader(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          window.pageLoader(false);
+          triggerAlert(JSON.stringify(error), "error");
+        });
     }
   }, []);
 
@@ -515,34 +578,38 @@ const Chat: React.FC = () => {
             )}
           </div>
 
-          <WelcomeChatComp />
+          {!userStory && <WelcomeChatComp />}
           <div className="chat-msg">
             <ViewStory
               taskId={taskId}
-              welcomeCompontent={() => userStory && <WelcomeChatComp />}
-              userQuery={() =>
-                userQuery && (
-                  <div>
-                    <h2
-                      style={{
-                        marginBottom: 25,
-                      }}
-                    >
-                      User Query
-                    </h2>
-                    <div className="chat-msg-list msg-hldr-cb gap10px pre-div ">
-                      <BoldText text={userQuery} />
+              welcomeCompontent={() => <></>}
+              userQuery={() => (
+                <>
+                  {userQuery && (
+                    <div>
+                      <h2
+                        style={{
+                          marginBottom: 25,
+                        }}
+                      >
+                        User Query
+                      </h2>
+                      <div className="chat-msg-list msg-hldr-cb gap10px pre-div ">
+                        <BoldText text={userQuery} />
+                      </div>
                     </div>
-                  </div>
-                )
-              }
+                  )}
+                  {imageUploadLoading && <Loader text="Uploading image" />}
+                </>
+              )}
               referance={() => (
                 <>
-                  {contextDataForStory && (
-                    <ContextFromMongo
-                      data={contextDataForStory?.results as any}
-                    />
-                  )}
+                  {contextDataForStory &&
+                    contextDataForStory?.results?.length > 0 && (
+                      <ContextFromMongo
+                        data={contextDataForStory?.results as any}
+                      />
+                    )}
                   {finsContextLoadding && (
                     <Loader text="Fetching relevant content" />
                   )}

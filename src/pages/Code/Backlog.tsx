@@ -4,21 +4,34 @@ import Button from "@mui/material/Button";
 import EditIcon from "@mui/icons-material/Edit";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import { GET_ALL_DATA } from "../../config";
+import { useFetch } from "../../hook/useFetch";
 
 const Backlog: React.FC = () => {
   interface BacklogItem {
     sprint: string;
     userStory: string;
-    id: number;
+    _id: number;
   }
-
+  const fetchData = useFetch();
   const [backlogItems, setBacklogItems] = React.useState<BacklogItem[]>([]);
 
   React.useEffect(() => {
-    const storedBacklogData = localStorage.getItem("backlogData");
-    if (storedBacklogData) {
-      setBacklogItems(JSON.parse(storedBacklogData));
-    }
+    window.pageLoader(true);
+
+    const requestOptions: RequestInit = {
+      method: "GET",
+      redirect: "follow" as RequestRedirect,
+    };
+
+    fetchData(GET_ALL_DATA, requestOptions)
+      .then((response) => response.json())
+      .then((result) => {
+        console.log(result);
+        setBacklogItems(result?.data);
+        window.pageLoader(false);
+      })
+      .catch((error) => console.error(error));
   }, []);
 
   const addNewStory = () => {
@@ -43,10 +56,12 @@ const Backlog: React.FC = () => {
   };
 
   const deleteTicket = (id: number) => {
-    const updatedBacklogItems = backlogItems.filter((item) => item.id !== id);
+    const updatedBacklogItems = backlogItems.filter((item) => item._id !== id);
     setBacklogItems(updatedBacklogItems);
     localStorage.setItem("backlogData", JSON.stringify(updatedBacklogItems));
   };
+
+  console.log(backlogItems);
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -83,12 +98,12 @@ const Backlog: React.FC = () => {
                 <DeleteForeverIcon
                   style={{ fontSize: 15, cursor: "pointer" }}
                   color="error"
-                  onClick={() => deleteTicket(item.id)}
+                  onClick={() => deleteTicket(item._id)}
                 />
                 <ArrowForwardIosIcon
                   style={{ fontSize: 15, cursor: "pointer" }}
                   color="success"
-                  onClick={() => viewTicket(item.id)}
+                  onClick={() => viewTicket(item._id)}
                 />
               </div>
             </div>
